@@ -1,0 +1,9 @@
+<Files OAuthAuthenticator.php>
+	Order allow,deny
+	Allow from all
+</Files>
+
+<Files OAuthDevice.php>
+	Order allow,deny
+	Allow from all
+</Files>
