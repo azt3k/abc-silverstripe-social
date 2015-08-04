@@ -12,64 +12,129 @@
  */
 class FBUpdate extends Page {
 
-	private static $db = array(
-		'UpdateID'			=> 'Varchar(255)',
-		'UpdateCreated'		=> 'SS_DateTime',
-		'OriginalUpdate'	=> 'Text'
-	);
+    private static $db = array(
+        'UpdateID'            => 'Varchar(255)',
+        'UpdateCreated'        => 'SS_DateTime',
+        'OriginalUpdate'    => 'Text'
+    );
 
-	public function updateFromUpdate(stdClass $update, $save = true) {
+    private static $defaults = array(
+        'holder_class'  => 'FBUpdateHolder',
+    );
 
-		$content = empty($update->message)
-			? empty($update->description) 
-				? $update->story
-				: $update->description
-			: $update->message;
+    /**
+     * @config
+     */
+    private static $conf = array();
 
-		if (!$content) die(print_r($update,1));
+    /**
+     *  @param  array|object $conf An associative array containing the configuration - see self::$conf for an example
+     *  @return void
+     */
+    public static function set_conf($conf) {
+        $conf = (array) $conf;
+        static::$conf = array_merge(static::$conf, $conf);
+    }
 
-		$this->Title			= 'Facebook Update - '.$update->id;
-		$this->URLSegment		= 'FBUpdate-'.$update->id;
-		$this->UpdateID			= $update->id;
-		$this->UpdateCreated	= date('Y-m-d H:i:s',strtotime($update->created_time));
-		$this->Content			= $content;
-		$this->OriginalUpdate	= json_encode($update);
+    /**
+     *  @return stdClass
+     */
+    public static function get_conf() {
+        return (object) array_merge(static::$defaults, static::$conf);
+    }
 
-		return $save ? $this->write() : true ;
+    /**
+     * @return void
+     */
+    protected static function set_conf_from_yaml() {
+        $conf = (array) Config::inst()->get(__CLASS__, 'conf');
+        if (!empty($conf))
+            static::$conf = array_merge(static::$conf, $conf);
+    }
 
+    /**
+     *  @return void
+     */
+    protected function configure() {
+        static::set_conf_from_yaml();
+    }
+
+	public function __construct($record = null, $isSingleton = false, $model = null) {
+		parent::__construct($record, $isSingleton, $model);
+		$this->configure();
 	}
 
-	public function PageTitle() {
+	public function onBeforeWrite() {
+        parent::onBeforeWrite();
+        $this->findParent();
+    }
 
-		// populate this with the original tweet data
-		$data = json_decode($this->OriginalUpdate);
+	public function findParent() {
+        if (!$this->ParentID) {
+            $conf = static::get_conf();
+            if (!$parent = DataObject::get_one($conf->holder_class)) {
+                $parent = new $conf->holder_class;
+                $parent->write();
+                $parent->doPublish();
+            }
+            $this->ParentID = $parent->ID;
+        }
+    }
 
-		return $data->from->name.' '.date('jS M', strtotime($this->UpdateCreated));
-	}
+    public function updateFromUpdate(stdClass $update, $save = true) {
 
-	/**
-	 * Adds all the tweet fields on to this object rather than just the ones we have seperated out
-	 *
-	 * @return \Tweet
-	 */
-	public function expandUpdateData(stdClass $update = null){
+        $content = empty($update->message)
+            ? empty($update->description)
+                ? $update->story
+                : $update->description
+            : $update->message;
 
-		$data = $tweet ? json_decode(json_encode($update),true) : json_decode($this->OriginalUpdate,true) ;
+        if (!$content) die(print_r($update,1));
 
-		$this->customise($data);
+        $this->Title            = 'Facebook Update - '.$update->id;
+        $this->URLSegment        = 'FBUpdate-'.$update->id;
+        $this->UpdateID            = $update->id;
+        $this->UpdateCreated    = date('Y-m-d H:i:s',strtotime($update->created_time));
+        $this->Content            = $content;
+        $this->OriginalUpdate    = json_encode($update);
 
-		return $this;
-	}
+		$this->findParent();
 
-	/**
-	 * Override canPublish check to allow publish from CLI
-	 * @param type $member
-	 * @return boolean
-	 */
-	public function canPublish($member = null) {
-		if (Director::is_cli()) return true;
-		else return parent::canPublish($member);
-	}
+        return $save ? $this->write() : true ;
+
+    }
+
+    public function PageTitle() {
+
+        // populate this with the original tweet data
+        $data = json_decode($this->OriginalUpdate);
+
+        return $data->from->name.' '.date('jS M', strtotime($this->UpdateCreated));
+    }
+
+    /**
+     * Adds all the tweet fields on to this object rather than just the ones we have seperated out
+     *
+     * @return \Tweet
+     */
+    public function expandUpdateData(stdClass $update = null){
+
+        $data = $tweet ? json_decode(json_encode($update),true) : json_decode($this->OriginalUpdate,true) ;
+
+        $this->customise($data);
+
+        return $this;
+    }
+
+    /**
+     * Override canPublish check to allow publish from CLI
+     * @param type $member
+     * @return boolean
+     */
+    public function canPublish($member = null) {
+        if (Director::is_cli()) return true;
+        else return parent::canPublish($member);
+    }
 
 }
 
