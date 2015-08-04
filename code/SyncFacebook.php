@@ -36,11 +36,16 @@ class SyncFacebook extends BuildTask implements CronTask {
         if (!$this->conf) $this->conf = $this->getConf();
 
         if (!self::$facebook_instance) {
-            self::$facebook_instance = new Facebook(array(
-                'app_id'  => $this->conf->FacebookAppId,
-                'app_secret' => $this->conf->FacebookAppSecret
-            ));
-            self::$facebook_instance->setDefaultAccessToken($this->conf->FacebookPageAccessToken);
+            if ($this->conf->FacebookAppId && $this->conf->FacebookAppSecret) {
+
+                self::$facebook_instance = new Facebook(array(
+                    'app_id'  => $this->conf->FacebookAppId,
+                    'app_secret' => $this->conf->FacebookAppSecret
+                ));
+
+                if ($this->conf->FacebookPageAccessToken)
+                    self::$facebook_instance->setDefaultAccessToken($this->conf->FacebookPageAccessToken);
+            }
         }
 
         return self::$facebook_instance;
