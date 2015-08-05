@@ -103,8 +103,8 @@ class FBAuthenticator extends Controller
 			return true;
 		} else {
 			$msg = '';
-			if (!$pageValid) $msg.= 'Your Facebook page configuration is broken; ';
-			if (!$userValid) $msg.= 'Your Facebook user configuration is broken; ';
+			if (!$pageValid) $msg.= 'Unable to fetch page data; ';
+			if (!$userValid) $msg.= 'Unable to fetch user data; ';
 			throw new Exception($msg);
 			return false;
 		}
