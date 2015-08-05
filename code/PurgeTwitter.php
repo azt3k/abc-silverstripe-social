@@ -37,5 +37,10 @@ class PurgeTwitter extends BuildTask {
             $page->deleteFromStage('Stage');
         }
 
+        foreach(Versioned::get_by_stage('Tweet', 'Live') as $page) {
+            echo "Deleting From Live: " . $page->Title . "\n";
+            $page->deleteFromStage('Live');
+        }
+
     }
 }

@@ -37,5 +37,10 @@ class PurgeFBUpdate extends BuildTask {
             $page->deleteFromStage('Stage');
         }
 
+        foreach(Versioned::get_by_stage('FBUpdate', 'Live') as $page) {
+            echo "Deleting From Live: " . $page->Title . "\n";
+            $page->deleteFromStage('Live');
+        }
+
     }
 }
