@@ -4,26 +4,26 @@ class SocialMediaConfig extends DataExtension {
 
 	private static $db = array(
 
-		'FacebookAppId'					=> 'Varchar(255)',
-		'FacebookAppSecret'				=> 'Varchar(255)',
-		'FacebookUserId'				=> 'Varchar(255)',
-		'FacebookUserAccessToken'		=> 'Varchar(255)',
-		'FacebookUserAccessTokenExpires'=> 'SS_DateTime',
-		'FacebookPageId'				=> 'Varchar(255)',
-		'FacebookPageAccessToken'		=> 'Varchar(255)',
-		'FacebookPageAccessTokenExpires'=> 'SS_DateTime',
-		'FacebookPageLink'				=> 'Varchar(255)',
-		'FacebookPushUpdates'			=> 'Boolean',
-		'FacebookPullUpdates'			=> 'Boolean',
+		'FacebookAppId'						=> 'Varchar(255)',
+		'FacebookAppSecret'					=> 'Varchar(255)',
+		'FacebookUserId'					=> 'Varchar(255)',
+		'FacebookUserAccessToken'			=> 'Varchar(255)',
+		'FacebookUserAccessTokenExpires'	=> 'SS_DateTime',
+		'FacebookPageId'					=> 'Varchar(255)',
+		'FacebookPageAccessToken'			=> 'Varchar(255)',
+		'FacebookPageAccessTokenExpires'	=> 'SS_DateTime',
+		'FacebookPageLink'					=> 'Varchar(255)',
+		'FacebookPushUpdates'				=> 'Boolean',
+		'FacebookPullUpdates'				=> 'Boolean',
 
-		'TwitterConsumerKey'			=> 'Varchar(255)',
-		'TwitterConsumerSecret'			=> 'Varchar(255)',
-		'TwitterOAuthToken'				=> 'Varchar(255)',
-		'TwitterOAuthTokenExpires'		=> 'SS_DateTime',
-		'TwitterOAuthSecret'			=> 'Varchar(255)',
-		'TwitterPageLink'				=> 'Varchar(255)',
-		'TwitterPushUpdates'			=> 'Boolean',
-		'TwitterPullUpdates'			=> 'Boolean'
+		'TwitterConsumerKey'				=> 'Varchar(255)',
+		'TwitterConsumerSecret'				=> 'Varchar(255)',
+		'TwitterOAuthToken'					=> 'Varchar(255)',
+		'TwitterOAuthTokenExpires'			=> 'SS_DateTime',
+		'TwitterOAuthSecret'				=> 'Varchar(255)',
+		'TwitterPageLink'					=> 'Varchar(255)',
+		'TwitterPushUpdates'				=> 'Boolean',
+		'TwitterPullUpdates'				=> 'Boolean'
 	);
 
 	public function updateCMSFields(FieldList $fields) {
@@ -39,11 +39,11 @@ class SocialMediaConfig extends DataExtension {
 			$pageValid = FBAuthenticator::validate_current_conf('page');
 		} catch (Exception $e) {
 			$pageMsg = $e->getMessage();
-			$this->owner->FacebookPageAccessToken = null;
-			$this->owner->write();
+			// $this->owner->FacebookPageAccessToken = null;
+			// $this->owner->write();
 			$fields->addFieldsToTab('Root.SocialMedia',	new LiteralField(
 				'FacebookBrokenPageConf',
-				'<span style="color:red">Your facebook page configuration is broken</span>'
+				'<span style="color:red">Your facebook page configuration is broken (' . $pageValid . ')</span>'
 			));
 		}
 
@@ -52,11 +52,11 @@ class SocialMediaConfig extends DataExtension {
 			$userValid = FBAuthenticator::validate_current_conf('user');
 		} catch (Exception $e) {
 			$userMsg = $e->getMessage();
-			$this->owner->FacebookUserAccessToken = null;
-			$this->owner->write();
+			// $this->owner->FacebookUserAccessToken = null;
+			// $this->owner->write();
 			$fields->addFieldsToTab('Root.SocialMedia',	new LiteralField(
 				'FacebookBrokenUserConf',
-				'<p style="color:red">Your facebook user configuration is broken</p>'
+				'<p style="color:red">Your facebook user configuration is broken (' . $userMsg . ')</p>'
 			));
 
 		}
@@ -83,8 +83,8 @@ class SocialMediaConfig extends DataExtension {
 			$twitterValid = TwitterAuthenticator::validate_current_conf();
 		} catch (Exception $e) {
 			$twitterMsg = $e->getMessage();
-			$this->owner->TwitterOAuthToken = null;
-			$this->owner->write();
+			// $this->owner->TwitterOAuthToken = null;
+			// $this->owner->write();
 			$fields->addFieldsToTab('Root.SocialMedia',	new LiteralField(
 				'TwitterBrokenConf',
 				'<p style="color:red">Your twitter configuration is broken</p>'

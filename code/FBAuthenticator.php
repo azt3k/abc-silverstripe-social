@@ -4,6 +4,11 @@ use Facebook\Facebook;
 
 class FBAuthenticator extends Controller
 {
+	private static $allowed_actions = array(
+		'index',
+		'purge'
+	);
+
 	protected $conf;
 
 	public function __construct() {
@@ -65,31 +70,31 @@ class FBAuthenticator extends Controller
 		$userValid = $pageValid = true;
 		$conf = SiteConfig::current_site_config();
 
-		if (
-			!$conf->FacebookAppId ||
-			!$conf->FacebookAppSecret ||
-			!$conf->FacebookUserId ||
-			!$conf->FacebookPageId ||
-			!$conf->FacebookUserAccessToken ||
-			!$conf->FacebookPageAccessToken
-		) {
-			throw new Exception('Incomplete facebook configuration');
-			return false;
-		}
+		// if (
+		// 	!$conf->FacebookAppId ||
+		// 	!$conf->FacebookAppSecret ||
+		// 	!$conf->FacebookUserId ||
+		// 	!$conf->FacebookPageId ||
+		// 	!$conf->FacebookUserAccessToken ||
+		// 	!$conf->FacebookPageAccessToken
+		// ) {
+		// 	throw new Exception('Incomplete facebook configuration');
+		// 	return false;
+		// }
 
 		// set up a call to the api
 
 		$facebook = new Facebook(array(
-			'app_id'  => $conf->FacebookAppId,
-			'app_secret' => $conf->FacebookAppSecret
+			'app_id'  		=> $conf->FacebookAppId,
+			'app_secret' 	=> $conf->FacebookAppSecret
 		));
 		if ( $validate == 'user' || (is_array($validate) && in_array('user', $validate)) ) {
-			$facebook->setDefaultAccessToken($conf->FacebookUserAccessToken);
+			$facebook->setDefaultAccessToken((string) $conf->FacebookUserAccessToken);
 			$userValid = (object) $facebook->sendRequest('get', '/me')->getDecodedBody();
 			$userValid = !empty($userValid->id) && $userValid->id == $conf->FacebookUserId ? true : false ;
 		}
 		if ( $validate == 'page' || (is_array($validate) && in_array('page', $validate)) ) {
-			$facebook->setDefaultAccessToken($conf->FacebookPageAccessToken);
+			$facebook->setDefaultAccessToken((string) $conf->FacebookPageAccessToken);
 			$pageValid = (object) $facebook->sendRequest('get', '/me')->getDecodedBody();
 			$pageValid = !empty($pageValid->id) && $pageValid->id == $conf->FacebookPageId ? true : false ;
 		}
@@ -185,7 +190,7 @@ class FBAuthenticator extends Controller
 
 			// final output
 			$freshConf->FacebookPageAccessToken && $freshConf->FacebookUserAccessToken
-				? die('authenticated')
+				? die('authenticated.<br>page token: ' . $freshConf->FacebookPageAccessToken . '<br>user token: ' . $freshConf->FacebookUserAccessToken)
 				: die('there was a problem authenticating');
 
 		}else{

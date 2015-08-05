@@ -8,9 +8,9 @@
 class Tweet extends Page {
 
     private static $db = array(
-        'TweetID'        => 'Varchar(255)',
-        'TweetCreated'    => 'SS_DateTime',
-        'OriginalTweet'    => 'Text'
+        'TweetID'           => 'Varchar(255)',
+        'OriginalCreated'   => 'SS_DateTime',
+        'OriginalTweet'     => 'Text'
     );
 
     private static $defaults = array(
@@ -81,7 +81,7 @@ class Tweet extends Page {
         $this->Title            = 'Tweet - '.$tweet->id_str;
         $this->URLSegment       = 'Tweet-'.$tweet->id_str;
         $this->TweetID          = $tweet->id_str;
-        $this->TweetCreated     = date('Y-m-d H:i:s',strtotime($tweet->created_at));
+        $this->OriginalCreated  = date('Y-m-d H:i:s',strtotime($tweet->created_at));
         $this->Content          = $tweet->text;
         $this->OriginalTweet    = json_encode($tweet);
 
@@ -96,7 +96,7 @@ class Tweet extends Page {
         // populate this with the original tweet data
         $data = json_decode($this->OriginalTweet);
 
-        return $data->user->name.' '.date('jS M', strtotime($this->TweetCreated));
+        return $data->user->name.' '.date('jS M', strtotime($this->OriginalCreated));
     }
 
     /**

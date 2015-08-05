@@ -8,13 +8,13 @@
 class FBUpdate extends Page {
 
     private static $db = array(
-        'UpdateID'            => 'Varchar(255)',
-        'UpdateCreated'        => 'SS_DateTime',
+        'UpdateID'          => 'Varchar(255)',
+        'OriginalCreated'   => 'SS_DateTime',
         'OriginalUpdate'    => 'Text'
     );
 
     private static $defaults = array(
-        'holder_class'  => 'FBUpdateHolder',
+        'holder_class'      => 'FBUpdateHolder',
     );
 
     /**
@@ -89,7 +89,7 @@ class FBUpdate extends Page {
         $this->Title            = 'Facebook Update - '.$update->id;
         $this->URLSegment        = 'FBUpdate-'.$update->id;
         $this->UpdateID            = $update->id;
-        $this->UpdateCreated    = date('Y-m-d H:i:s',strtotime($update->created_time));
+        $this->OriginalCreated    = date('Y-m-d H:i:s',strtotime($update->created_time));
         $this->Content            = $content;
         $this->OriginalUpdate    = json_encode($update);
 
@@ -104,7 +104,7 @@ class FBUpdate extends Page {
         // populate this with the original tweet data
         $data = json_decode($this->OriginalUpdate);
 
-        return $data->from->name.' '.date('jS M', strtotime($this->UpdateCreated));
+        return $data->from->name.' '.date('jS M', strtotime($this->OriginalCreated));
     }
 
     /**

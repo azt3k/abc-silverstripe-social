@@ -126,7 +126,7 @@ class SyncFacebook extends BuildTask implements CronTask {
 
                             // get tweets
                             $until = empty($q->until) ? '' : $q->until;
-                            $resp = (object) $this->facebook->api("/".$this->conf->FacebookPageId."/feed?limit=25&until=".$until);
+                            $resp = (object) $this->facebook->sendRequest('get', '/' . $this->conf->FacebookPageId . '/feed?limit=25&until=' . $until)->getDecodedBody();
 
                             // only proceed if we have results to work with
                             if (count($resp->data)) {
