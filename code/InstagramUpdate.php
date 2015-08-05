@@ -14,7 +14,7 @@ class InstagramUpdate extends Page {
 
 	private static $db = array(
 		'UpdateID'			=> 'Varchar(255)',
-		'UpdateCreated'		=> 'SS_DateTime',
+		'OriginalCreated'   => 'SS_DateTime',
 		'OriginalUpdate'	=> 'Text'
 	);
 
