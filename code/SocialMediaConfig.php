@@ -62,6 +62,7 @@ class SocialMediaConfig extends DataExtension {
 		}
 
 		$fields->addFieldsToTab('Root.SocialMedia', new LiteralField('FacebookAppLink', 'Manage your apps here: <a href="https://developers.facebook.com/apps/">https://developers.facebook.com/apps/</a>'));
+		$fields->addFieldsToTab('Root.SocialMedia', new LiteralField('FacebookIDLink', 'Find your FB ID here: <a href="http://findmyfbid.com/">http://findmyfbid.com/</a>'));
 		$fields->addFieldsToTab('Root.SocialMedia',	new TextField('FacebookAppId', 'Facebook App Id'));
 		$fields->addFieldsToTab('Root.SocialMedia',	new TextField('FacebookAppSecret', 'Facebook App Secret'));
 		$fields->addFieldsToTab('Root.SocialMedia',	new TextField('FacebookUserId', 'Facebook User Id'));
