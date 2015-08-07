@@ -38,13 +38,30 @@ class SyncFacebook extends BuildTask implements CronTask {
         if (!self::$facebook_instance) {
             if (!empty($this->conf->FacebookAppId) && !empty($this->conf->FacebookAppSecret)) {
 
+                // facebook
                 self::$facebook_instance = new Facebook(array(
                     'app_id'  => $this->conf->FacebookAppId,
                     'app_secret' => $this->conf->FacebookAppSecret
                 ));
 
-                if (!empty($this->conf->FacebookPageAccessToken))
-                    self::$facebook_instance->setDefaultAccessToken($this->conf->FacebookPageAccessToken);
+                // get page token
+                $token = $this->conf->FacebookPageAccessToken;
+
+                // if the page token is bad then get an app access token
+                if (empty($token)) {
+
+                    $url = '/oauth/access_token' .
+                            '?client_id=' . $this->conf->FacebookAppId .
+                            '&client_secret=' . $this->conf->FacebookAppSecret .
+                            '&grant_type=client_credentials';
+
+                    $res = self::$facebook_instance->sendRequest('get', $url)->getDecodedBody();
+                    $token = $res['access_token'];
+
+                }
+
+                // set token
+                self::$facebook_instance->setDefaultAccessToken($token);
             }
         }
 
@@ -139,7 +156,7 @@ class SyncFacebook extends BuildTask implements CronTask {
 
                             }
                         } else {
-                            die(print_r($resp,1));
+                            echo "Encountered Error with : " . print_r($resp,1);
                         }
 
                     } else{
@@ -188,9 +205,14 @@ class SyncFacebook extends BuildTask implements CronTask {
 
                     // create the tweet data object
                     $update = new FBUpdate;
-                    $update->updateFromUpdate($data);
-                    $update->write();
-                    if (!$update->doPublish()) die('Failed to Publish '.$update->Title);
+
+                    if ($update->updateFromUpdate($data)) {
+                        
+                        $update->write();
+
+                        if (!$update->doPublish())
+                            echo 'Failed to Publish '.$update->Title . "\n";
+                    }
 
                     // set no new flag
                     $noNew = false;

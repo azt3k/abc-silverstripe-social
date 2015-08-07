@@ -80,22 +80,29 @@ class FBUpdate extends Page {
 
         $content = empty($update->message)
             ? empty($update->description)
-                ? $update->story
+                ? empty($update->story)
+                    ? null
+                    : $update->story
                 : $update->description
             : $update->message;
 
-        if (!$content) die(print_r($update,1));
+        if (!$content) {
+            echo 'Encountered error with: ' . print_r($update,1);
+            return false;
+        }
+        else {
 
-        $this->Title            = 'Facebook Update - '.$update->id;
-        $this->URLSegment        = 'FBUpdate-'.$update->id;
-        $this->UpdateID            = $update->id;
-        $this->OriginalCreated    = date('Y-m-d H:i:s',strtotime($update->created_time));
-        $this->Content            = $content;
-        $this->OriginalUpdate    = json_encode($update);
+            $this->Title            = 'Facebook Update - '.$update->id;
+            $this->URLSegment        = 'FBUpdate-'.$update->id;
+            $this->UpdateID            = $update->id;
+            $this->OriginalCreated    = date('Y-m-d H:i:s',strtotime($update->created_time));
+            $this->Content            = $content;
+            $this->OriginalUpdate    = json_encode($update);
 
-		$this->findParent();
+    		$this->findParent();
 
-        return $save ? $this->write() : true ;
+            return $save ? $this->write() : true ;
+        }
 
     }
 
