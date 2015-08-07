@@ -125,10 +125,11 @@ class FBUpdate extends Page {
     }
 
     public function OriginalLink() {
+        $id = SiteConfig::current_site_config()->FacebookPageId;
         return 'https://www.facebook.com/' .
-            SiteConfig::current_site_config()->FacebookPageId .
+            $id .
             '/posts/' .
-            $this->UpdateID;
+            str_replace($id . '_', '', $this->UpdateID);
     }
 
     public function PageTitle() {
