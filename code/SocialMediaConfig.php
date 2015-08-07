@@ -22,6 +22,7 @@ class SocialMediaConfig extends DataExtension {
 		'TwitterOAuthTokenExpires'			=> 'SS_DateTime',
 		'TwitterOAuthSecret'				=> 'Varchar(255)',
 		'TwitterPageLink'					=> 'Varchar(255)',
+		'TwitterUsername'					=> 'Varchar(255)',
 		'TwitterPushUpdates'				=> 'Boolean',
 		'TwitterPullUpdates'				=> 'Boolean'
 	);
@@ -97,6 +98,7 @@ class SocialMediaConfig extends DataExtension {
 		$fields->addFieldsToTab('Root.SocialMedia',	new TextField('TwitterConsumerKey', 'Twitter Consumer Key'));
 		$fields->addFieldsToTab('Root.SocialMedia',	new TextField('TwitterConsumerSecret', 'Twitter Consumer Secret'));
 		$fields->addFieldsToTab('Root.SocialMedia',	new TextField('TwitterPageLink', 'Twitter Page Link'));
+		$fields->addFieldsToTab('Root.SocialMedia',	new TextField('TwitterUsername', 'Twitter Username'));		
 		$fields->addFieldsToTab('Root.SocialMedia',	new CheckboxField('TwitterPushUpdates', 'Push publication updates to authorised Twitter account'));
 		$fields->addFieldsToTab('Root.SocialMedia',	new CheckboxField('TwitterPullUpdates', 'Pull publication updates from authorised Twitter account'));
 		$fields->addFieldsToTab('Root.SocialMedia',	new LiteralField('TwitterOAuthToken', '<p>Twiter OAuth Token</p><p>'.($this->owner->TwitterOAuthToken ? $this->owner->TwitterOAuthToken.' <a href="/TwitterAuthenticator?wipe=1" target="_blank">Wipe</a>' : '<a href="/TwitterAuthenticator?start=1" target="_blank">Authenticate</a>').'</p>'));

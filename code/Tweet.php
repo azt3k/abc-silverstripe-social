@@ -13,8 +13,12 @@ class Tweet extends Page {
         'OriginalTweet'     => 'Text'
     );
 
+    private static $has_one = array(
+        'PrimaryImage'      => 'Image',
+    );
+
     private static $defaults = array(
-        'holder_class'  => 'TweetHolder',
+        'holder_class'      => 'TweetHolder',
     );
 
     /**
@@ -89,6 +93,27 @@ class Tweet extends Page {
 
         return $save ? $this->write() : true ;
 
+    }
+
+    public function getCMSFields() {
+
+        $fields = parent::getCMSFields();
+
+        $lastEditedDateField = new DateTimeField('OriginalCreated');
+        $lastEditedDateField->setConfig('showcalendar', true);
+        $fields->addFieldToTab('Root.Main', $lastEditedDateField, 'Content');
+
+        $fields->addFieldToTab('Root.Original', new TextareaField('OriginalTweet'));
+
+        return $fields;
+
+    }
+
+    public function OriginalLink() {
+        return 'https://twitter.com/' .
+            SiteConfig::current_site_config()->TwitterUsername .
+            '/status/' .
+            $this->TweetID;
     }
 
     public function PageTitle() {

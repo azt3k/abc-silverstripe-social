@@ -13,6 +13,10 @@ class FBUpdate extends Page {
         'OriginalUpdate'    => 'Text'
     );
 
+    private static $has_one = array(
+        'PrimaryImage'      => 'Image',
+    );
+
     private static $defaults = array(
         'holder_class'      => 'FBUpdateHolder',
     );
@@ -92,18 +96,39 @@ class FBUpdate extends Page {
         }
         else {
 
-            $this->Title            = 'Facebook Update - '.$update->id;
-            $this->URLSegment        = 'FBUpdate-'.$update->id;
-            $this->UpdateID            = $update->id;
-            $this->OriginalCreated    = date('Y-m-d H:i:s',strtotime($update->created_time));
-            $this->Content            = $content;
-            $this->OriginalUpdate    = json_encode($update);
+            $this->Title                = 'Facebook Update - '.$update->id;
+            $this->URLSegment           = 'FBUpdate-'.$update->id;
+            $this->UpdateID             = $update->id;
+            $this->OriginalCreated      = date('Y-m-d H:i:s',strtotime($update->created_time));
+            $this->Content              = $content;
+            $this->OriginalUpdate       = json_encode($update);
 
     		$this->findParent();
 
             return $save ? $this->write() : true ;
         }
 
+    }
+
+    public function getCMSFields() {
+
+        $fields = parent::getCMSFields();
+
+        $lastEditedDateField = new DateTimeField('OriginalCreated');
+        $lastEditedDateField->setConfig('showcalendar', true);
+        $fields->addFieldToTab('Root.Main', $lastEditedDateField, 'Content');
+
+        $fields->addFieldToTab('Root.Original', new TextareaField('OriginalUpdate'));
+
+        return $fields;
+
+    }
+
+    public function OriginalLink() {
+        return 'https://www.facebook.com/' .
+            SiteConfig::current_site_config()->FacebookPageId .
+            '/posts/' .
+            $this->UpdateID;
     }
 
     public function PageTitle() {
