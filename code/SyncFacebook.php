@@ -27,19 +27,19 @@ class SyncFacebook extends BuildTask implements CronTask {
     }
 
     public function getConf() {
-        if (!self::$conf_instance) self::$conf_instance = SiteConfig::current_site_config();
-        return self::$conf_instance;
+        if (!static::$conf_instance) static::$conf_instance = SiteConfig::current_site_config();
+        return static::$conf_instance;
     }
 
     public function getFacebook() {
 
         if (!$this->conf) $this->conf = $this->getConf();
 
-        if (!self::$facebook_instance) {
+        if (!static::$facebook_instance) {
             if (!empty($this->conf->FacebookAppId) && !empty($this->conf->FacebookAppSecret)) {
 
                 // facebook
-                self::$facebook_instance = new Facebook(array(
+                static::$facebook_instance = new Facebook(array(
                     'app_id'  => $this->conf->FacebookAppId,
                     'app_secret' => $this->conf->FacebookAppSecret
                 ));
@@ -55,23 +55,23 @@ class SyncFacebook extends BuildTask implements CronTask {
                             '&client_secret=' . $this->conf->FacebookAppSecret .
                             '&grant_type=client_credentials';
 
-                    $res = self::$facebook_instance->sendRequest('get', $url)->getDecodedBody();
+                    $res = static::$facebook_instance->sendRequest('get', $url)->getDecodedBody();
                     $token = $res['access_token'];
 
                 }
 
                 // set token
-                self::$facebook_instance->setDefaultAccessToken($token);
+                static::$facebook_instance->setDefaultAccessToken($token);
             }
         }
 
-        return self::$facebook_instance;
+        return static::$facebook_instance;
     }
 
     function init() {
 
-        parent::init();
-        //Controller::init();
+        // parent::init();
+        // Controller::init();
 
         if (!Director::is_cli() && !Permission::check("ADMIN") && $_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) {
             return Security::permissionFailure();
@@ -207,7 +207,7 @@ class SyncFacebook extends BuildTask implements CronTask {
                     $update = new FBUpdate;
 
                     if ($update->updateFromUpdate($data)) {
-                        
+
                         $update->write();
 
                         if (!$update->doPublish())

@@ -118,7 +118,7 @@ class FBAuthenticator extends Controller
         if (!Permission::checkMember($user, 'ADMIN')) return $this->httpError(401, 'You do not have access to the requested content');
 
         // purge
-        self::purge_auth_tokens();
+        static::purge_auth_tokens();
 
         die('Auth tokens purged.<br><br><a href="/FBAuthenticator">Click here to authorise</a>');
 
@@ -143,12 +143,12 @@ class FBAuthenticator extends Controller
         $code = empty($_REQUEST['code']) ? null : $_REQUEST['code'] ;
 
         if(empty($code)) {
-            $dialog_url = self::getOAuthDialogURL();
+            $dialog_url = static::getOAuthDialogURL();
             header('Location: '.$dialog_url);
             exit;
         }
 
-        if (self::validateCRSF()) {
+        if (static::validateCRSF()) {
 
             // The user access token url
             $token_url =    'https://graph.facebook.com/oauth/access_token?'.

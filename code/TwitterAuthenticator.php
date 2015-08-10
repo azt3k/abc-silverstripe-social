@@ -11,35 +11,35 @@ class TwitterAuthenticator extends Controller {
 
 	public function __construct() {
 
-		$this->conf		= self::get_conf();
-		$this->tmhOAuth = self::get_tmh_oauth();
+		$this->conf		= static::get_conf();
+		$this->tmhOAuth = static::get_tmh_oauth();
 
 		parent::__construct();
 	}
 
 	public static function get_conf() {
-		if (!self::$conf_instance) self::$conf_instance = SiteConfig::current_site_config();
-		return self::$conf_instance;
+		if (!static::$conf_instance) static::$conf_instance = SiteConfig::current_site_config();
+		return static::$conf_instance;
 	}
 
 	public static function get_tmh_oauth() {
 
-		$conf = self::get_conf();
+		$conf = static::get_conf();
 
-		if (!self::$tmh_oauth_instance) {
-			self::$tmh_oauth_instance = new tmhOAuth(array(
+		if (!static::$tmh_oauth_instance) {
+			static::$tmh_oauth_instance = new tmhOAuth(array(
 				'consumer_key'		=> $conf->TwitterConsumerKey,
 				'consumer_secret'	=> $conf->TwitterConsumerSecret,
 			));
 		}
 
-		return self::$tmh_oauth_instance;
+		return static::$tmh_oauth_instance;
 	}
 
 	public static function validate_current_conf() {
 
-		$conf		= self::get_conf();
-		$tmhOAuth	= self::get_tmh_oauth();
+		$conf		= static::get_conf();
+		$tmhOAuth	= static::get_tmh_oauth();
 
 		$tmhOAuth->config['user_token']		= $conf->TwitterOAuthToken;
 		$tmhOAuth->config['user_secret']	= $conf->TwitterOAuthSecret;
@@ -69,7 +69,7 @@ class TwitterAuthenticator extends Controller {
 		$this->conf->TwitterOAuthSecret = null;
 		$this->conf->write();
 		unset($_SESSION['oauth']);
-		header('Location: ' . Twitter::php_self());
+		header('Location: ' . SocialHelper::php_self());
 	}
 
 	// Step 1: Request a temporary token
@@ -78,7 +78,7 @@ class TwitterAuthenticator extends Controller {
 			'POST',
 			$this->tmhOAuth->url('oauth/request_token', ''),
 			array(
-				'oauth_callback' => Twitter::php_self()
+				'oauth_callback' => SocialHelper::php_self()
 			)
 		);
 
@@ -120,7 +120,7 @@ class TwitterAuthenticator extends Controller {
 			$this->conf->TwitterOAuthSecret = $token['oauth_token_secret'];
 			$this->conf->write();
 			unset($_SESSION['oauth']);
-			header('Location: ' . Twitter::php_self());
+			header('Location: ' . SocialHelper::php_self());
 		} else {
 			$this->addError();
 		}

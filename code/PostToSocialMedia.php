@@ -5,7 +5,7 @@ class PostToSocialMedia extends Controller
 
 	public function __construct() {
 
-		self::$conf = SiteConfig::current_site_config();
+		static::$conf = SiteConfig::current_site_config();
 
 		parent::__construct();
 
@@ -17,21 +17,21 @@ class PostToSocialMedia extends Controller
 	 */
 	public function confirmTwitterAccess() {
 
-		if (!self::$conf->TwitterPushUpdates) return false;
+		if (!static::$conf->TwitterPushUpdates) return false;
 
 		if (
-			self::$conf->TwitterConsumerKey &&
-			self::$conf->TwitterConsumerSecret &&
-			self::$conf->TwitterOAuthToken &&
-			self::$conf->TwitterOAuthSecret
+			static::$conf->TwitterConsumerKey &&
+			static::$conf->TwitterConsumerSecret &&
+			static::$conf->TwitterOAuthToken &&
+			static::$conf->TwitterOAuthSecret
 		) {
 			try {
 				TwitterAuthenticator::validate_current_conf();
 				return true;
 			} catch (Exception $e) {
-				self::$conf->TwitterOAuthToken = null;
-				self::$conf->TwitterOAuthSecret = null;
-				self::$conf->write();
+				static::$conf->TwitterOAuthToken = null;
+				static::$conf->TwitterOAuthSecret = null;
+				static::$conf->write();
 				return false;
 			}
 		} else {
@@ -45,21 +45,21 @@ class PostToSocialMedia extends Controller
 	 */
 	public function confirmFacebookAccess() {
 
-		if (!self::$conf->FacebookPushUpdates) return false;
+		if (!static::$conf->FacebookPushUpdates) return false;
 
 		try {
 			FBAuthenticator::validate_current_conf('page');
 		} catch (Exception $e) {
-			self::$conf->FacebookPageAccessToken = null;
-			self::$conf->write();
+			static::$conf->FacebookPageAccessToken = null;
+			static::$conf->write();
 			return false;
 		}
 
 		try {
 			FBAuthenticator::validate_current_conf('user');
 		} catch (Exception $e) {
-			self::$conf->FacebookUserAccessToken = null;
-			self::$conf->write();
+			static::$conf->FacebookUserAccessToken = null;
+			static::$conf->write();
 			return false;
 		}
 
@@ -83,13 +83,13 @@ class PostToSocialMedia extends Controller
 		if (in_array('facebook', $services) && $this->confirmFacebookAccess()) {
 
 			$facebook = new Facebook(array(
-				'appId'  => self::$conf->FacebookAppId,
-				'secret' => self::$conf->FacebookAppSecret,
+				'appId'  => static::$conf->FacebookAppId,
+				'secret' => static::$conf->FacebookAppSecret,
 			));
 
-			$facebook->setAccessToken(self::$conf->FacebookPageAccessToken);
+			$facebook->setAccessToken(static::$conf->FacebookPageAccessToken);
 			try {
-				$post_id = $facebook->api("/".self::$conf->FacebookPageId."/feed", "post", $data);
+				$post_id = $facebook->api("/".static::$conf->FacebookPageId."/feed", "post", $data);
 				$ids['facebook'] = $post_id['id'];
 			} catch (FacebookApiException $e) {
 				SS_Log::log('Error '.$e->getCode().' : '.$e->getFile().' Line '.$e->getLine().' : '.$e->getMessage()."\n".'BackTrace: '."\n".$e->getTraceAsString(),SS_Log::ERR);
@@ -101,10 +101,10 @@ class PostToSocialMedia extends Controller
 		if (in_array('twitter', $services) && $this->confirmTwitterAccess()) {
 
 			$connection = new tmhOAuth(array(
-				'consumer_key'		=> self::$conf->TwitterConsumerKey,
-				'consumer_secret'	=> self::$conf->TwitterConsumerSecret,
-				'user_token'		=> self::$conf->TwitterOAuthToken,
-				'user_secret'		=> self::$conf->TwitterOAuthSecret
+				'consumer_key'		=> static::$conf->TwitterConsumerKey,
+				'consumer_secret'	=> static::$conf->TwitterConsumerSecret,
+				'user_token'		=> static::$conf->TwitterOAuthToken,
+				'user_secret'		=> static::$conf->TwitterOAuthSecret
 			));
 
 			$tweet = $data['name'] . ": " . $data['link'];

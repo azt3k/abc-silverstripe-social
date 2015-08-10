@@ -27,7 +27,7 @@ class FBUpdate extends Page {
     private static $conf = array();
 
     /**
-     *  @param  array|object $conf An associative array containing the configuration - see self::$conf for an example
+     *  @param  array|object $conf An associative array containing the configuration - see static::$conf for an example
      *  @return void
      */
     public static function set_conf($conf) {

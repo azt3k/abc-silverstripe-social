@@ -25,29 +25,29 @@ class SyncTwitter extends BuildTask implements CronTask{
     }
 
     public function getConf() {
-        if (!self::$conf_instance) self::$conf_instance = SiteConfig::current_site_config();
-        return self::$conf_instance;
+        if (!static::$conf_instance) static::$conf_instance = SiteConfig::current_site_config();
+        return static::$conf_instance;
     }
 
     public function getTmhOauth() {
 
         if (!$this->conf) $this->conf = $this->getConf();
 
-        if (!self::$tmh_oauth_instance) {
-            self::$tmh_oauth_instance = new tmhOAuth(array(
+        if (!static::$tmh_oauth_instance) {
+            static::$tmh_oauth_instance = new tmhOAuth(array(
                 'consumer_key'        => $this->conf->TwitterConsumerKey,
                 'consumer_secret'    => $this->conf->TwitterConsumerSecret,
             ));
-            self::$tmh_oauth_instance->config['user_token']        = $this->conf->TwitterOAuthToken;
-            self::$tmh_oauth_instance->config['user_secret']    = $this->conf->TwitterOAuthSecret;
+            static::$tmh_oauth_instance->config['user_token']        = $this->conf->TwitterOAuthToken;
+            static::$tmh_oauth_instance->config['user_secret']    = $this->conf->TwitterOAuthSecret;
         }
 
-        return self::$tmh_oauth_instance;
+        return static::$tmh_oauth_instance;
     }
 
     public function init() {
 
-        parent::init();
+        // parent::init();
         // Controller::init();
 
         if (!Director::is_cli() && !Permission::check("ADMIN") && $_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) {
