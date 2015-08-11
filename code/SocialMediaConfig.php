@@ -137,8 +137,8 @@ class SocialMediaConfig extends DataExtension {
         }
 
         $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('InstagramAppLink', '<p>Manage your apps here: <a href="http://instagr.am/developer/">http://instagr.am/developer/</a></p>'));
-        $fields->addFieldsToTab('Root.SocialMedia', new TextField('InstagramApiKey', 'Instagram Key'));
-        $fields->addFieldsToTab('Root.SocialMedia', new TextField('InstagramApiSecret', 'Instagram Secret'));
+        $fields->addFieldsToTab('Root.SocialMedia', new TextField('InstagramApiKey', 'Instagram Client ID'));
+        $fields->addFieldsToTab('Root.SocialMedia', new TextField('InstagramApiSecret', 'Instagram Client Secret'));
 
         // only add the username field if we don't have an auth token
         if (!$this->owner->InstagramOAuthToken) {
