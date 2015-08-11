@@ -1,124 +1,128 @@
 <?php
-class PostToSocialMedia extends Controller
-{
-	protected static $conf;
 
-	public function __construct() {
+/**
+ * @author AzT3k
+ */
+class PostToSocialMedia extends Controller {
 
-		static::$conf = SiteConfig::current_site_config();
+    protected static $conf;
 
-		parent::__construct();
+    public function __construct() {
 
-	}
+        static::$conf = SiteConfig::current_site_config();
 
-	/**
-	 * @todo actually validate the configuration - will need to create a class extened from controller for authenticating / validating the configuration refer to FBAuthenticator
-	 * @return boolean
-	 */
-	public function confirmTwitterAccess() {
+        parent::__construct();
 
-		if (!static::$conf->TwitterPushUpdates) return false;
+    }
 
-		if (
-			static::$conf->TwitterConsumerKey &&
-			static::$conf->TwitterConsumerSecret &&
-			static::$conf->TwitterOAuthToken &&
-			static::$conf->TwitterOAuthSecret
-		) {
-			try {
-				TwitterAuthenticator::validate_current_conf();
-				return true;
-			} catch (Exception $e) {
-				static::$conf->TwitterOAuthToken = null;
-				static::$conf->TwitterOAuthSecret = null;
-				static::$conf->write();
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
+    /**
+     * @todo actually validate the configuration - will need to create a class extened from controller for authenticating / validating the configuration refer to FBAuthenticator
+     * @return boolean
+     */
+    public function confirmTwitterAccess() {
 
-	/**
-	 *
-	 * @return boolean
-	 */
-	public function confirmFacebookAccess() {
+        if (!static::$conf->TwitterPushUpdates) return false;
 
-		if (!static::$conf->FacebookPushUpdates) return false;
+        if (
+            static::$conf->TwitterConsumerKey &&
+            static::$conf->TwitterConsumerSecret &&
+            static::$conf->TwitterOAuthToken &&
+            static::$conf->TwitterOAuthSecret
+        ) {
+            try {
+                TwitterAuthenticator::validate_current_conf();
+                return true;
+            } catch (Exception $e) {
+                static::$conf->TwitterOAuthToken = null;
+                static::$conf->TwitterOAuthSecret = null;
+                static::$conf->write();
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 
-		try {
-			FBAuthenticator::validate_current_conf('page');
-		} catch (Exception $e) {
-			static::$conf->FacebookPageAccessToken = null;
-			static::$conf->write();
-			return false;
-		}
+    /**
+     *
+     * @return boolean
+     */
+    public function confirmFacebookAccess() {
 
-		try {
-			FBAuthenticator::validate_current_conf('user');
-		} catch (Exception $e) {
-			static::$conf->FacebookUserAccessToken = null;
-			static::$conf->write();
-			return false;
-		}
+        if (!static::$conf->FacebookPushUpdates) return false;
 
-		return true;
-	}
+        try {
+            FBAuthenticator::validate_current_conf('page');
+        } catch (Exception $e) {
+            static::$conf->FacebookPageAccessToken = null;
+            static::$conf->write();
+            return false;
+        }
 
-	/**
-	 *
-	 * @param array $data
-	 * @param array $services
-	 */
-	public function sendToSocialMedia(array $data, array $services = array('facebook','twitter')) {
+        try {
+            FBAuthenticator::validate_current_conf('user');
+        } catch (Exception $e) {
+            static::$conf->FacebookUserAccessToken = null;
+            static::$conf->write();
+            return false;
+        }
 
-		// init output
-		$ids = array(
-			'facebook'	=> null,
-			'twitter'	=> null
-		);
+        return true;
+    }
 
-		// Facebook
-		if (in_array('facebook', $services) && $this->confirmFacebookAccess()) {
+    /**
+     *
+     * @param array $data
+     * @param array $services
+     */
+    public function sendToSocialMedia(array $data, array $services = array('facebook','twitter')) {
 
-			$facebook = new Facebook(array(
-				'appId'  => static::$conf->FacebookAppId,
-				'secret' => static::$conf->FacebookAppSecret,
-			));
+        // init output
+        $ids = array(
+            'facebook'    => null,
+            'twitter'    => null
+        );
 
-			$facebook->setAccessToken(static::$conf->FacebookPageAccessToken);
-			try {
-				$post_id = $facebook->api("/".static::$conf->FacebookPageId."/feed", "post", $data);
-				$ids['facebook'] = $post_id['id'];
-			} catch (FacebookApiException $e) {
-				SS_Log::log('Error '.$e->getCode().' : '.$e->getFile().' Line '.$e->getLine().' : '.$e->getMessage()."\n".'BackTrace: '."\n".$e->getTraceAsString(),SS_Log::ERR);
-			}
+        // Facebook
+        if (in_array('facebook', $services) && $this->confirmFacebookAccess()) {
 
-		}
+            $facebook = new Facebook(array(
+                'appId'  => static::$conf->FacebookAppId,
+                'secret' => static::$conf->FacebookAppSecret,
+            ));
 
-		// Twitter
-		if (in_array('twitter', $services) && $this->confirmTwitterAccess()) {
+            $facebook->setAccessToken(static::$conf->FacebookPageAccessToken);
+            try {
+                $post_id = $facebook->api("/".static::$conf->FacebookPageId."/feed", "post", $data);
+                $ids['facebook'] = $post_id['id'];
+            } catch (FacebookApiException $e) {
+                SS_Log::log('Error '.$e->getCode().' : '.$e->getFile().' Line '.$e->getLine().' : '.$e->getMessage()."\n".'BackTrace: '."\n".$e->getTraceAsString(),SS_Log::ERR);
+            }
 
-			$connection = new tmhOAuth(array(
-				'consumer_key'		=> static::$conf->TwitterConsumerKey,
-				'consumer_secret'	=> static::$conf->TwitterConsumerSecret,
-				'user_token'		=> static::$conf->TwitterOAuthToken,
-				'user_secret'		=> static::$conf->TwitterOAuthSecret
-			));
+        }
 
-			$tweet = $data['name'] . ": " . $data['link'];
-			$code = $connection->request('POST', $connection->url('1.1/statuses/update'), array('status' => $tweet));
+        // Twitter
+        if (in_array('twitter', $services) && $this->confirmTwitterAccess()) {
 
-			if ($code == 200) {
-				$data = json_decode($connection->response['response']);
-				$ids['twitter'] = $data->id_str;
-			}
+            $connection = new tmhOAuth(array(
+                'consumer_key'        => static::$conf->TwitterConsumerKey,
+                'consumer_secret'    => static::$conf->TwitterConsumerSecret,
+                'user_token'        => static::$conf->TwitterOAuthToken,
+                'user_secret'        => static::$conf->TwitterOAuthSecret
+            ));
+
+            $tweet = $data['name'] . ": " . $data['link'];
+            $code = $connection->request('POST', $connection->url('1.1/statuses/update'), array('status' => $tweet));
+
+            if ($code == 200) {
+                $data = json_decode($connection->response['response']);
+                $ids['twitter'] = $data->id_str;
+            }
 
 
-		}
+        }
 
-		return $ids;
+        return $ids;
 
-	}
+    }
 }

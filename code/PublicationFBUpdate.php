@@ -1,11 +1,15 @@
 <?php
+
+/**
+ * @author AzT3k
+ */
 class PublicationFBUpdate extends DataObject {
 
-	private static $db = array(
-		'FBUpdateID'	=> 'Varchar(255)'
-	);
+    private static $db = array(
+        'FBUpdateID' => 'Varchar(255)'
+    );
 
-	private static $has_one = array(
-		'Page'		=> 'Page'
-	);
+    private static $has_one = array(
+        'Page' => 'Page'
+    );
 }

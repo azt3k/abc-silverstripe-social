@@ -38,27 +38,14 @@ class SyncFacebook extends BuildTask implements CronTask {
         if (!static::$facebook_instance) {
             if (!empty($this->conf->FacebookAppId) && !empty($this->conf->FacebookAppSecret)) {
 
-                // facebook
+                // init fb
                 static::$facebook_instance = new Facebook(array(
                     'app_id'  => $this->conf->FacebookAppId,
                     'app_secret' => $this->conf->FacebookAppSecret
                 ));
 
-                // get page token
-                $token = $this->conf->FacebookPageAccessToken;
-
-                // if the page token is bad then get an app access token
-                if (empty($token)) {
-
-                    $url = '/oauth/access_token' .
-                            '?client_id=' . $this->conf->FacebookAppId .
-                            '&client_secret=' . $this->conf->FacebookAppSecret .
-                            '&grant_type=client_credentials';
-
-                    $res = static::$facebook_instance->sendRequest('get', $url)->getDecodedBody();
-                    $token = $res['access_token'];
-
-                }
+                // get access token
+                $token = (string) SocialHelper::fb_access_token();
 
                 // set token
                 static::$facebook_instance->setDefaultAccessToken($token);
@@ -70,8 +57,7 @@ class SyncFacebook extends BuildTask implements CronTask {
 
     function init() {
 
-        // parent::init();
-        // Controller::init();
+        if (method_exists(parent,'init')) parent::init();
 
         if (!Director::is_cli() && !Permission::check("ADMIN") && $_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) {
             return Security::permissionFailure();
@@ -108,8 +94,10 @@ class SyncFacebook extends BuildTask implements CronTask {
         // if there was no last tweet we need to go into initial population
         $initPop = $lastUpdate ? false : true ;
 
-        // get tweets
+        // get updates
         $resp = (object) $this->facebook->sendRequest('get', '/' . $this->conf->FacebookPageId . '/feed')->getDecodedBody();
+
+        // die(print_r($resp,1));
 
         // only proceed if we have results to work with
         if (count($resp->data)) {
@@ -202,6 +190,10 @@ class SyncFacebook extends BuildTask implements CronTask {
                     echo "Adding Update ".$data->id."<br />\n";
                     flush();
                     ob_flush();
+
+                    // get extended info
+                    // $res = (object) $this->facebook->sendRequest('get', '/' . $data->id)->getDecodedBody();
+                    // die(print_r($res,1));
 
                     // create the tweet data object
                     $update = new FBUpdate;

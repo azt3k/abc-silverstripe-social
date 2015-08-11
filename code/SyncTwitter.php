@@ -47,8 +47,7 @@ class SyncTwitter extends BuildTask implements CronTask{
 
     public function init() {
 
-        // parent::init();
-        // Controller::init();
+        if (method_exists(parent,'init')) parent::init();
 
         if (!Director::is_cli() && !Permission::check("ADMIN") && $_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) {
             return Security::permissionFailure();

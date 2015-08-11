@@ -1,8 +1,6 @@
 <?php
 
 /**
- * Description of FBUpdate
- *
  * @author AzT3k
  */
 class FBUpdateHolder extends Page {

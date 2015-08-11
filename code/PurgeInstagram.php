@@ -3,7 +3,7 @@
 /**
  * @author AzT3k
  */
-class PurgeTwitter extends BuildTask {
+class PurgeInstagram extends BuildTask {
 
     public function init() {
 
@@ -27,17 +27,17 @@ class PurgeTwitter extends BuildTask {
         flush();
         ob_flush();
 
-        foreach(Tweet::get() as $page) {
+        foreach(InstagramUpdate::get() as $page) {
             echo "Deleting " . $page->Title . "\n";
             $page->delete();
         }
 
-        foreach(Versioned::get_by_stage('Tweet', 'Stage') as $page) {
+        foreach(Versioned::get_by_stage('InstagramUpdate', 'Stage') as $page) {
             echo "Deleting From Stage: " . $page->Title . "\n";
             $page->deleteFromStage('Stage');
         }
 
-        foreach(Versioned::get_by_stage('Tweet', 'Live') as $page) {
+        foreach(Versioned::get_by_stage('InstagramUpdate', 'Live') as $page) {
             echo "Deleting From Live: " . $page->Title . "\n";
             $page->deleteFromStage('Live');
         }

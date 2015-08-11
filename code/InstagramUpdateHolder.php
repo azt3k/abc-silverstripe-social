@@ -1,8 +1,6 @@
 <?php
 
 /**
- * Description of Instagram
- *
  * @author AzT3k
  */
 class InstagramHolder extends Page {

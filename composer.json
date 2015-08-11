@@ -19,6 +19,7 @@
         "silverstripe/crontask"     : "*@stable",
         "themattharris/tmhoauth"    : "0.8.*@stable",
         "facebook/php-sdk-v4"       : "5.0.*@stable",
-        "cosenary/instagram"        : "2.3.*@stable"
+        "cosenary/instagram"        : "2.3.*@stable",
+        "guzzlehttp/guzzle"         : "*@stable"
     }
 }

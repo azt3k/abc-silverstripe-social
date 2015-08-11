@@ -82,13 +82,46 @@ class Tweet extends Page {
 
     public function updateFromTweet(stdClass $tweet, $save = true) {
 
+        if (!empty($tweet->entities->media[0])) {
+
+            // extract media
+            $media = $tweet->entities->media[0];
+
+            // only process photos
+            if ($media->type == 'photo') {
+
+                // get url
+                $img = $media->media_url;
+
+                // sanity check
+                if (!is_dir(ASSETS_PATH . '/social-updates/')) mkdir(ASSETS_PATH . '/social-updates/');
+
+                // pull down image
+                $pi = pathinfo($img);
+                $absPath = ASSETS_PATH . '/social-updates/' . $pi['basename'];
+                $relPath = ASSETS_DIR . '/social-updates/' . $pi['basename'];
+                if (!file_exists($absPath)) {
+                    $imgData = file_get_contents($img);
+                    file_put_contents($absPath, $imgData);
+                }
+
+                // create image record
+                $image = new Image;
+                $image->setFilename($relPath);
+                $image->write();
+
+                // associate
+                $this->PrimaryImageID = $image->ID;
+
+            }
+        }
+
         $this->Title            = 'Tweet - '.$tweet->id_str;
         $this->URLSegment       = 'Tweet-'.$tweet->id_str;
         $this->TweetID          = $tweet->id_str;
         $this->OriginalCreated  = date('Y-m-d H:i:s',strtotime($tweet->created_at));
         $this->Content          = $tweet->text;
         $this->OriginalTweet    = json_encode($tweet);
-
 		$this->findParent();
 
         return $save ? $this->write() : true ;
@@ -103,7 +136,7 @@ class Tweet extends Page {
         $lastEditedDateField->setConfig('showcalendar', true);
         $fields->addFieldToTab('Root.Main', $lastEditedDateField, 'Content');
 
-        $fields->addFieldToTab('Root.Original', new TextareaField('OriginalTweet'));
+        $fields->addFieldToTab('Root.Original', new LiteralField('OriginalTweet', str_replace("\n", '<br>', print_r($this->OriginalTweet,1))));
 
         return $fields;
 
@@ -116,25 +149,14 @@ class Tweet extends Page {
             $this->TweetID;
     }
 
-    public function PageTitle() {
-
-        // populate this with the original tweet data
-        $data = json_decode($this->OriginalTweet);
-
-        return $data->user->name.' '.date('jS M', strtotime($this->OriginalCreated));
-    }
-
     /**
      * Adds all the tweet fields on to this object rather than just the ones we have seperated out
      *
      * @return \Tweet
      */
     public function expandTweetData(stdClass $tweet = null){
-
-        $data = $tweet ? json_decode(json_encode($tweet),true) : json_decode($this->OriginalTweet,true) ;
-
+        $data = $tweet ? json_decode(json_encode($tweet),true) : json_decode($this->OriginalTweet,true);
         $this->customise($data);
-
         return $this;
     }
 

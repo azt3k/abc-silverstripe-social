@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @todo need reconcile removals in both directions
+ * @author AzT3k
  */
 class PurgeFBUpdate extends BuildTask {
 

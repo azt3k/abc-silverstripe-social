@@ -118,6 +118,7 @@ class TwitterAuthenticator extends Controller {
 			$token = $this->tmhOAuth->extract_params($this->tmhOAuth->response['response']);
 			$this->conf->TwitterOAuthToken = $token['oauth_token'];
 			$this->conf->TwitterOAuthSecret = $token['oauth_token_secret'];
+			$this->conf->TwitterUsername = $token['screen_name'];
 			$this->conf->write();
 			unset($_SESSION['oauth']);
 			header('Location: ' . SocialHelper::php_self());
