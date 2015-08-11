@@ -150,7 +150,7 @@ class SocialMediaConfig extends DataExtension {
         $fields->addFieldsToTab('Root.SocialMedia', new CheckboxField('InstagramPullUpdates', 'Pull publication updates from authorised Instagram account'));
 
         $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('InstagramUserData', '<h4>Instagram User</h4>'));
-        $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('InstagramUsername', '<p><a target="_blank" href="' . $this->InstagramPageLink(). '">' . $this->owner->InstagramUsername . '(' . $this->owner->InstagramUserId . ')</a></p>'));
+        $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('InstagramUserLink', '<p><a target="_blank" href="' . $this->InstagramPageLink(). '">' . $this->owner->InstagramUsername . '(' . $this->owner->InstagramUserId . ')</a></p>'));
         $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('InstagramOAuthToken', '<p>OAuth Token</p><p>'.($this->owner->InstagramOAuthToken ? $this->owner->InstagramOAuthToken.' <a href="/InstagramAuthenticator?wipe=1" target="_blank">Wipe</a>' : '<a href="/InstagramAuthenticator?start=1" target="_blank">Authenticate</a>').'</p>'));
 
         return $fields;
