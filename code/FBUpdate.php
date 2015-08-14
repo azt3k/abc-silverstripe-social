@@ -101,14 +101,18 @@ class FBUpdate extends Page {
         // print_r($update);
         $pageid = SiteConfig::current_site_config()->FacebookPageId;
         $postid = str_replace($pageid . '_', '', $update->id);
-        
+
         try {
             $picUrl = $this->resolveUrl('https://graph.facebook.com/' . $postid . '/picture');
         } catch (Exception $e) {
             $picUrl = '';
         }
 
-        if ($picUrl && $picUrl != 'https://fbstatic-a.akamaihd.net/rsrc.php/v2/yA/r/gPCjrIGykBe.gif') {
+        if (
+            $picUrl &&
+            $picUrl != 'https://fbstatic-a.akamaihd.net/rsrc.php/v2/yA/r/gPCjrIGykBe.gif' &&
+            $picUrl != 'https://fbstatic-a.akamaihd.net/rsrc.php/v2/y6/r/_xS7LcbxKS4.gif'
+        ) {
 
             // get url
             $img = $picUrl;
