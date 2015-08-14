@@ -102,7 +102,7 @@ class InstagramUpdate extends Page {
             $this->Title            = 'Instagram Update - ' . $update->id;
             $this->URLSegment       = 'InstagramUpdate-' . $update->id;
             $this->UpdateID         = $update->id;
-            $this->UpdateCreated    = date('Y-m-d H:i:s', $update->created_time);
+            $this->OriginalCreated  = date('Y-m-d H:i:s', $update->created_time);
             $this->Content          = $content;
             $this->OriginalUpdate   = json_encode($update);
             $this->PrimaryImageID   = $image->ID;
