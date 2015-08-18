@@ -84,19 +84,32 @@ class InstagramUpdate extends Page {
             // sanity check
             if (!is_dir(ASSETS_PATH . '/social-updates/')) mkdir(ASSETS_PATH . '/social-updates/');
 
-            // pull down image
+            // prep img data
             $pi = pathinfo($img);
             $absPath = ASSETS_PATH . '/social-updates/' . $pi['basename'];
             $relPath = ASSETS_DIR . '/social-updates/' . $pi['basename'];
+
+            // pull down image
             if (!file_exists($absPath)) {
                 $imgData = file_get_contents($img);
                 file_put_contents($absPath, $imgData);
             }
 
-            // create image record
-            $image = new Image;
-            $image->setFilename($relPath);
-            $image->write();
+            // does the file exist
+            if (file_exists($absPath)) {
+
+                // try to find the existing image
+                if (!$image = DataObject::get_one('Image', "Filename='" . $relPath . "'")) {
+
+                    // create image record
+                    $image = new Image;
+                    $image->setFilename($relPath);
+                    $image->write();
+                }
+
+                // associate
+                if ($image->ID) $this->PrimaryImageID = $image->ID;
+            }
 
             // update
             $this->Title            = 'Instagram Update - ' . $update->id;
@@ -105,7 +118,6 @@ class InstagramUpdate extends Page {
             $this->OriginalCreated  = date('Y-m-d H:i:s', $update->created_time);
             $this->Content          = $content;
             $this->OriginalUpdate   = json_encode($update);
-            $this->PrimaryImageID   = $image->ID;
             $this->findParent();
 
             return $save ? $this->write() : true;
