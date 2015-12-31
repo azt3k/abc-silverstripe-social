@@ -3,7 +3,8 @@
 /**
  * @todo need reconcile removals in both directions
  */
-class SyncTwitter extends BuildTask implements CronTask{
+class SyncTwitter extends BuildTask implements CronTask
+{
 
     protected static $conf_instance;
     protected static $tmh_oauth_instance;
@@ -12,26 +13,32 @@ class SyncTwitter extends BuildTask implements CronTask{
     protected $errors = array();
     protected $messages = array();
 
-    public function __construct() {
-
+    public function __construct()
+    {
         $this->conf        = $this->getConf();
         $this->tmhOAuth = $this->getTmhOauth();
 
         parent::__construct();
     }
 
-    public function getSchedule() {
+    public function getSchedule()
+    {
         return "*/5 * * * *";
     }
 
-    public function getConf() {
-        if (!static::$conf_instance) static::$conf_instance = SiteConfig::current_site_config();
+    public function getConf()
+    {
+        if (!static::$conf_instance) {
+            static::$conf_instance = SiteConfig::current_site_config();
+        }
         return static::$conf_instance;
     }
 
-    public function getTmhOauth() {
-
-        if (!$this->conf) $this->conf = $this->getConf();
+    public function getTmhOauth()
+    {
+        if (!$this->conf) {
+            $this->conf = $this->getConf();
+        }
 
         if (!static::$tmh_oauth_instance) {
             static::$tmh_oauth_instance = new tmhOAuth(array(
@@ -45,24 +52,29 @@ class SyncTwitter extends BuildTask implements CronTask{
         return static::$tmh_oauth_instance;
     }
 
-    public function init() {
-
-        if (method_exists(parent,'init')) parent::init();
+    public function init()
+    {
+        if (method_exists(parent, 'init')) {
+            parent::init();
+        }
 
         if (!Director::is_cli() && !Permission::check("ADMIN") && $_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) {
             return Security::permissionFailure();
         }
 
-        if (!$this->conf || !$this->tmhOAuth) $this->__construct();
-
+        if (!$this->conf || !$this->tmhOAuth) {
+            $this->__construct();
+        }
     }
 
-    public function process() {
+    public function process()
+    {
         $this->init();
         $this->run();
     }
 
-    public function run($request) {
+    public function run($request)
+    {
 
         // output
         echo "<br />\n<br />\nSyncing...<br />\n<br />\n";
@@ -76,8 +88,10 @@ class SyncTwitter extends BuildTask implements CronTask{
 
         // grab the most recent tweet
         $params = array();
-        if ($lastTweet = DataObject::get_one('Tweet','','','TweetID DESC')) {
-            if ($lastTweet->TweetID) $params['since_id'] = $lastTweet->TweetID;
+        if ($lastTweet = DataObject::get_one('Tweet', '', '', 'TweetID DESC')) {
+            if ($lastTweet->TweetID) {
+                $params['since_id'] = $lastTweet->TweetID;
+            }
         }
 
         // set the number of hits
@@ -117,11 +131,11 @@ class SyncTwitter extends BuildTask implements CronTask{
                      while ($code == 200 && count($resp)) {
 
                         // find the earliest tweet we have in the db
-                        $firstTweet = DataObject::get_one('Tweet','','','TweetID ASC');
+                        $firstTweet = DataObject::get_one('Tweet', '', '', 'TweetID ASC');
 
                         // reconfigure the params
                         unset($params['since_id']);
-                        $params['max_id'] = $firstTweet->TweetID;
+                         $params['max_id'] = $firstTweet->TweetID;
 
                         // get tweets
                         $code = $this->tmhOAuth->request(
@@ -143,11 +157,11 @@ class SyncTwitter extends BuildTask implements CronTask{
                                 $noNew = $this->processResponse($resp);
 
                                 // break if we haven't added anything
-                                if ($noNew) break;
-
+                                if ($noNew) {
+                                    break;
+                                }
                             }
                         }
-
                      }
 
                     // output
@@ -155,31 +169,25 @@ class SyncTwitter extends BuildTask implements CronTask{
                     flush();
                     ob_flush();
                 }
-
             } else {
 
                 // output
                 echo "No hits <br />\n<br />\n";
                 flush();
                 ob_flush();
-
             }
-
         } else {
-
             die($code." : ".$this->tmhOAuth->response['response']);
-
         }
-
     }
 
-    public function processResponse(array $resp) {
-
+    public function processResponse(array $resp)
+    {
         $noNew = true;
 
         foreach ($resp as $tweetData) {
-            if (!$savedTweet = DataObject::get_one('Tweet',"TweetID='".$tweetData->id_str."'")) {
-                if (!$pubTweet = DataObject::get_one('PublicationTweet',"TweetID='".$tweetData->id_str."'")) {
+            if (!$savedTweet = DataObject::get_one('Tweet', "TweetID='".$tweetData->id_str."'")) {
+                if (!$pubTweet = DataObject::get_one('PublicationTweet', "TweetID='".$tweetData->id_str."'")) {
 
                     // push output
                     echo "Adding Tweet ".$tweetData->id_str."<br />\n";
@@ -190,20 +198,19 @@ class SyncTwitter extends BuildTask implements CronTask{
                     $tweet = new Tweet;
                     $tweet->updateFromTweet($tweetData);
                     $tweet->write();
-                    if (!$tweet->doPublish()) die('Failed to Publish '.$tweet->Title);
+                    if (!$tweet->doPublish()) {
+                        die('Failed to Publish '.$tweet->Title);
+                    }
 
                     // set no new flag
                     $noNew = false;
-
                 } else {
 
                     // push output
                     echo "Tweet ".$tweetData->id_str." came from the website<br />\n";
                     flush();
                     ob_flush();
-
                 }
-
             } else {
 
                 // this should only happen during initial population because we should have only got in tweets that are newer than x
@@ -212,12 +219,9 @@ class SyncTwitter extends BuildTask implements CronTask{
                 echo "Already added Tweet ".$tweetData->id_str."<br />\n";
                 flush();
                 ob_flush();
-
             }
         }
 
         return $noNew;
-
     }
-
 }

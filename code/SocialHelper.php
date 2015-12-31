@@ -5,22 +5,23 @@ use Facebook\Facebook;
 /**
  * @author AzT3k
  */
-class SocialHelper extends Object {
+class SocialHelper extends Object
+{
 
     /**
      * generates a url to the current page
      * @param  boolean $dropqs [description]
      * @return string          [description]
      */
-    public static function php_self($dropqs = true) {
-
+    public static function php_self($dropqs = true)
+    {
         $protocol = 'http';
 
-        if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on')
+        if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') {
             $protocol = 'https';
-
-        elseif (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == '443'))
+        } elseif (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == '443')) {
             $protocol = 'https';
+        }
 
         $url    = sprintf('%s://%s%s', $protocol, $_SERVER['SERVER_NAME'], $_SERVER['REQUEST_URI']);
         $parts  = parse_url($url);
@@ -31,17 +32,21 @@ class SocialHelper extends Object {
         $qs     = @$parts['query'];
         $port or $port = ($scheme == 'https') ? '443' : '80';
 
-        if (($scheme == 'https' && $port != '443') || ($scheme == 'http' && $port != '80'))
+        if (($scheme == 'https' && $port != '443') || ($scheme == 'http' && $port != '80')) {
             $host = "$host:$port";
+        }
 
         $url = $scheme. '://' . $host . $path;
 
-        if (!$dropqs) return "{$url}?{$qs}";
-        else return $url;
+        if (!$dropqs) {
+            return "{$url}?{$qs}";
+        } else {
+            return $url;
+        }
     }
 
-    public static function fb_access_token() {
-
+    public static function fb_access_token()
+    {
         $conf = SiteConfig::current_site_config();
         $token = null;
 
@@ -49,11 +54,12 @@ class SocialHelper extends Object {
         $token = $conf->FacebookPageAccessToken;
 
         // if that failed get the user token
-        if (!$token) $token = $conf->FacebookUserAccessToken;
+        if (!$token) {
+            $token = $conf->FacebookUserAccessToken;
+        }
 
         // if the page and user token are bad then get an app access token
         if (!$token) {
-
             $facebook = new Facebook(array(
                 'app_id'  => $conf->FacebookAppId,
                 'app_secret' => $conf->FacebookAppSecret
@@ -66,11 +72,9 @@ class SocialHelper extends Object {
 
             $res = $facebook->sendRequest('get', $url)->getDecodedBody();
             $token = $res['access_token'];
-
         }
 
         return $token;
-
     }
 
     /**
@@ -80,11 +84,16 @@ class SocialHelper extends Object {
      * @param  string $type    [description]
      * @return string          [description]
      */
-    public static function link($id, $service, $type = 'user') {
+    public static function link($id, $service, $type = 'user')
+    {
         switch ($service) {
             case 'facebook':
-                if ($type == 'user') return 'https://www.facebook.com/' . $id;
-                if ($type == 'page') return 'https://www.facebook.com/pages/' . $id;
+                if ($type == 'user') {
+                    return 'https://www.facebook.com/' . $id;
+                }
+                if ($type == 'page') {
+                    return 'https://www.facebook.com/pages/' . $id;
+                }
 
             case 'twitter':
                 return 'https://twitter.com/' . $id;
@@ -95,5 +104,4 @@ class SocialHelper extends Object {
         }
         return null;
     }
-
 }

@@ -5,7 +5,8 @@ use Facebook\Facebook;
 /**
  * @todo need reconcile removals in both directions
  */
-class SyncFacebook extends BuildTask implements CronTask {
+class SyncFacebook extends BuildTask implements CronTask
+{
 
     protected static $conf_instance;
     protected static $facebook_instance;
@@ -14,26 +15,32 @@ class SyncFacebook extends BuildTask implements CronTask {
     protected $errors = array();
     protected $messages = array();
 
-    public function __construct() {
-
+    public function __construct()
+    {
         $this->conf     = $this->getConf();
         $this->facebook = $this->getFacebook();
 
         parent::__construct();
     }
 
-    public function getSchedule() {
+    public function getSchedule()
+    {
         return "*/5 * * * *";
     }
 
-    public function getConf() {
-        if (!static::$conf_instance) static::$conf_instance = SiteConfig::current_site_config();
+    public function getConf()
+    {
+        if (!static::$conf_instance) {
+            static::$conf_instance = SiteConfig::current_site_config();
+        }
         return static::$conf_instance;
     }
 
-    public function getFacebook() {
-
-        if (!$this->conf) $this->conf = $this->getConf();
+    public function getFacebook()
+    {
+        if (!$this->conf) {
+            $this->conf = $this->getConf();
+        }
 
         if (!static::$facebook_instance) {
             if (!empty($this->conf->FacebookAppId) && !empty($this->conf->FacebookAppSecret)) {
@@ -55,24 +62,29 @@ class SyncFacebook extends BuildTask implements CronTask {
         return static::$facebook_instance;
     }
 
-    function init() {
-
-        if (method_exists(parent,'init')) parent::init();
+    public function init()
+    {
+        if (method_exists(parent, 'init')) {
+            parent::init();
+        }
 
         if (!Director::is_cli() && !Permission::check("ADMIN") && $_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) {
             return Security::permissionFailure();
         }
 
-        if (!$this->conf || !$this->facebook) $this->__construct();
-
+        if (!$this->conf || !$this->facebook) {
+            $this->__construct();
+        }
     }
 
-    public function process() {
+    public function process()
+    {
         $this->init();
         $this->run();
     }
 
-    function run($request) {
+    public function run($request)
+    {
 
         // output
         echo "<br />\n<br />\nSyncing...<br />\n<br />\n";
@@ -86,7 +98,7 @@ class SyncFacebook extends BuildTask implements CronTask {
 
         // grab the most recent tweet
         $params = array();
-        $params['since'] = ($lastUpdate = DataObject::get_one('FBUpdate','','','UpdateID DESC')) ? $lastUpdate->UpdateID  : 1 ;
+        $params['since'] = ($lastUpdate = DataObject::get_one('FBUpdate', '', '', 'UpdateID DESC')) ? $lastUpdate->UpdateID  : 1 ;
 
         // set the number of hits
         $params['limit'] = 200;
@@ -140,42 +152,38 @@ class SyncFacebook extends BuildTask implements CronTask {
                                 $noNew = $this->processResponse($resp->data);
 
                                 // break if we haven't added anything
-                                if ($noNew) break;
-
+                                if ($noNew) {
+                                    break;
+                                }
                             }
                         } else {
-                            echo "Encountered Error with : " . print_r($resp,1);
+                            echo "Encountered Error with : " . print_r($resp, 1);
                         }
-
-                    } else{
+                    } else {
                         // output
                         echo "No more pages <br />\n<br />\n";
                         flush();
                         ob_flush();
                         break;
                     }
-
-                 }
+                }
 
                 // output
                 echo "Finished\n";
                 flush();
                 ob_flush();
             }
-
         } else {
 
             // output
             echo "No hits <br /><br />\n";
             flush();
             ob_flush();
-
         }
-
     }
 
-    public function processResponse(array $resp) {
-
+    public function processResponse(array $resp)
+    {
         $noNew = true;
 
         foreach ($resp as $data) {
@@ -183,8 +191,8 @@ class SyncFacebook extends BuildTask implements CronTask {
             // type cast
             $data = (object) $data;
 
-            if (!$savedUpdate = DataObject::get_one('FBUpdate',"UpdateID='".$data->id."'")) {
-                if (!$pubUpdate = DataObject::get_one('PublicationFBUpdate',"FBUpdateID='".$data->id."'")) {
+            if (!$savedUpdate = DataObject::get_one('FBUpdate', "UpdateID='".$data->id."'")) {
+                if (!$pubUpdate = DataObject::get_one('PublicationFBUpdate', "FBUpdateID='".$data->id."'")) {
 
                     // push output
                     echo "Adding Update ".$data->id."<br />\n";
@@ -199,23 +207,21 @@ class SyncFacebook extends BuildTask implements CronTask {
                     $update = new FBUpdate;
 
                     if ($update->updateFromUpdate($data)) {
-
                         $update->write();
 
-                        if (!$update->doPublish())
+                        if (!$update->doPublish()) {
                             echo 'Failed to Publish '.$update->Title . "\n";
+                        }
                     }
 
                     // set no new flag
                     $noNew = false;
-
                 } else {
 
                     // push output
                     echo "Update ".$data->id." came from the website<br />\n";
                     flush();
                     ob_flush();
-
                 }
             } else {
 
@@ -225,12 +231,9 @@ class SyncFacebook extends BuildTask implements CronTask {
                 echo "Already added Update ".$data->id."<br />\n";
                 flush();
                 ob_flush();
-
             }
         }
 
         return $noNew;
-
     }
-
 }

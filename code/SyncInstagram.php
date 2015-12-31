@@ -2,7 +2,8 @@
 
 use MetzWeb\Instagram\Instagram;
 
-class SyncInstagram extends BuildTask implements CronTask{
+class SyncInstagram extends BuildTask implements CronTask
+{
 
     protected static $conf_instance;
     protected static $instagram_instance;
@@ -11,24 +12,29 @@ class SyncInstagram extends BuildTask implements CronTask{
     protected $errors = array();
     protected $messages = array();
 
-    public function __construct() {
-
+    public function __construct()
+    {
         $this->conf = static::get_conf();
         $this->instagram = static::get_instagram();
 
         parent::__construct();
     }
 
-    public function getSchedule() {
+    public function getSchedule()
+    {
         return "*/5 * * * *";
     }
 
-    public static function get_conf() {
-        if (!static::$conf_instance) static::$conf_instance = SiteConfig::current_site_config();
+    public static function get_conf()
+    {
+        if (!static::$conf_instance) {
+            static::$conf_instance = SiteConfig::current_site_config();
+        }
         return static::$conf_instance;
     }
 
-    public static function get_instagram() {
+    public static function get_instagram()
+    {
         if (!static::$instagram_instance) {
             $conf = static::get_conf();
             static::$instagram_instance = new Instagram(array(
@@ -41,24 +47,29 @@ class SyncInstagram extends BuildTask implements CronTask{
         return static::$instagram_instance;
     }
 
-    public function init() {
-
-        if (method_exists(parent,'init')) parent::init();
+    public function init()
+    {
+        if (method_exists(parent, 'init')) {
+            parent::init();
+        }
 
         if (!Director::is_cli() && !Permission::check("ADMIN") && $_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) {
             return Security::permissionFailure();
         }
 
-        if (!$this->conf || !$this->instagram) $this->__construct();
-
+        if (!$this->conf || !$this->instagram) {
+            $this->__construct();
+        }
     }
 
-    public function process() {
+    public function process()
+    {
         $this->init();
         $this->run();
     }
 
-    public function run($request) {
+    public function run($request)
+    {
 
         // output
         echo "<br />\n<br />\nSyncing...<br />\n<br />\n";
@@ -83,7 +94,6 @@ class SyncInstagram extends BuildTask implements CronTask{
 
         // only proceed if the request was valid
         if ((!empty($updates->meta) && $updates->meta->code == 200)) {
-
             if (!empty($updates->data)) {
 
                 // process the response
@@ -99,12 +109,13 @@ class SyncInstagram extends BuildTask implements CronTask{
 
                     // keep going until we hit a problem
                     while ($updates = $this->instagram->pagination($updates)) {
-
                         if ((!empty($updates->meta) && $updates->meta->code == 200)) {
-                            if (!empty($updates->data)) $this->processResponse($updates);
+                            if (!empty($updates->data)) {
+                                $this->processResponse($updates);
+                            }
+                        } else {
+                            die(print_r($updates, 1));
                         }
-                        else die(print_r($updates ,1));
-
                     }
 
                     // output
@@ -112,23 +123,20 @@ class SyncInstagram extends BuildTask implements CronTask{
                     flush();
                     ob_flush();
                 }
-
             } else {
 
                 // output
                 echo "No hits <br />\n<br />\n";
                 flush();
                 ob_flush();
-
             }
+        } else {
+            die(print_r($updates, 1));
         }
-
-        else die(print_r($updates ,1));
-
     }
 
-    public function processResponse(stdClass $resp) {
-
+    public function processResponse(stdClass $resp)
+    {
         $noNew = true;
 
         foreach ($resp->data as $data) {
@@ -145,25 +153,22 @@ class SyncInstagram extends BuildTask implements CronTask{
 
                     // try to update
                     if ($update->updateFromUpdate($data)) {
-
                         $update->write();
 
-                        if (!$update->doPublish())
+                        if (!$update->doPublish()) {
                             echo 'Failed to Publish '.$update->Title . "\n";
+                        }
                     }
 
                     // set no new flag
                     $noNew = false;
-
                 } else {
 
                     // push output
                     echo "InstagramUpdate ".$data->id." came from the website<br />\n";
                     flush();
                     ob_flush();
-
                 }
-
             } else {
 
                 // this should only happen during initial population because we should have only got in InstagramUpdates that are newer than x
@@ -172,12 +177,9 @@ class SyncInstagram extends BuildTask implements CronTask{
                 echo "Already added InstagramUpdate ".$data->id."<br />\n";
                 flush();
                 ob_flush();
-
             }
         }
 
         return $noNew;
-
     }
-
 }

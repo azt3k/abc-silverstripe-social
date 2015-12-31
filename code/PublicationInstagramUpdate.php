@@ -3,7 +3,8 @@
 /**
  * @author AzT3k
  */
-class PublicationInstagramUpdate extends DataObject {
+class PublicationInstagramUpdate extends DataObject
+{
 
     private static $db = array(
         'InstagramUpdateID' => 'Varchar(255)'

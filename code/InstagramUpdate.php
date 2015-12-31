@@ -3,7 +3,8 @@
 /**
  * @author AzT3k
  */
-class InstagramUpdate extends Page {
+class InstagramUpdate extends Page
+{
 
     /**
      * @var array
@@ -37,7 +38,8 @@ class InstagramUpdate extends Page {
      *  @param  array|object $conf An associative array containing the configuration - see static::$conf for an example
      *  @return void
      */
-    public static function set_conf($conf) {
+    public static function set_conf($conf)
+    {
         $conf = (array) $conf;
         static::$conf = array_merge(static::$conf, $conf);
     }
@@ -45,44 +47,50 @@ class InstagramUpdate extends Page {
     /**
      *  @return stdClass
      */
-    public static function get_conf() {
+    public static function get_conf()
+    {
         return (object) array_merge(static::$defaults, static::$conf);
     }
 
     /**
      * @return void
      */
-    protected static function set_conf_from_yaml() {
+    protected static function set_conf_from_yaml()
+    {
         $conf = (array) Config::inst()->get(__CLASS__, 'conf');
-        if (!empty($conf))
+        if (!empty($conf)) {
             static::$conf = array_merge(static::$conf, $conf);
+        }
     }
 
     /**
      *  @return void
      */
-    protected function configure() {
+    protected function configure()
+    {
         static::set_conf_from_yaml();
     }
 
-    public function __construct($record = null, $isSingleton = false, $model = null) {
+    public function __construct($record = null, $isSingleton = false, $model = null)
+    {
         parent::__construct($record, $isSingleton, $model);
         $this->configure();
     }
 
-    public function updateFromUpdate(stdClass $update, $save = true) {
-
+    public function updateFromUpdate(stdClass $update, $save = true)
+    {
         $content = empty($update->caption) ? '' : $update->caption->text;
         $img = empty($update->images) ? '' : $update->images->standard_resolution->url;
 
         if (!$content && !$img) {
-            echo 'Encountered error with: ' . print_r($update,1);
+            echo 'Encountered error with: ' . print_r($update, 1);
             return false;
-        }
-        else {
+        } else {
 
             // sanity check
-            if (!is_dir(ASSETS_PATH . '/social-updates/')) mkdir(ASSETS_PATH . '/social-updates/');
+            if (!is_dir(ASSETS_PATH . '/social-updates/')) {
+                mkdir(ASSETS_PATH . '/social-updates/');
+            }
 
             // prep img data
             $pi = pathinfo($img);
@@ -108,7 +116,9 @@ class InstagramUpdate extends Page {
                 }
 
                 // associate
-                if ($image->ID) $this->PrimaryImageID = $image->ID;
+                if ($image->ID) {
+                    $this->PrimaryImageID = $image->ID;
+                }
             }
 
             // update
@@ -124,26 +134,27 @@ class InstagramUpdate extends Page {
         }
     }
 
-    public function getCMSFields() {
-
+    public function getCMSFields()
+    {
         $fields = parent::getCMSFields();
 
         $lastEditedDateField = new DateTimeField('OriginalCreated');
         $lastEditedDateField->setConfig('showcalendar', true);
         $fields->addFieldToTab('Root.Main', $lastEditedDateField, 'Content');
 
-        $fields->addFieldToTab('Root.Original', new LiteralField('OriginalUpdate', str_replace("\n", '<br>', print_r($this->OriginalUpdate,1))));
+        $fields->addFieldToTab('Root.Original', new LiteralField('OriginalUpdate', str_replace("\n", '<br>', print_r($this->OriginalUpdate, 1))));
 
         return $fields;
-
     }
 
-    public function onBeforeWrite() {
+    public function onBeforeWrite()
+    {
         parent::onBeforeWrite();
         $this->findParent();
     }
 
-    public function findParent() {
+    public function findParent()
+    {
         if (!$this->ParentID) {
             $conf = static::get_conf();
             if (!$parent = DataObject::get_one($conf->holder_class)) {
@@ -155,7 +166,8 @@ class InstagramUpdate extends Page {
         }
     }
 
-    public function OriginalLink() {
+    public function OriginalLink()
+    {
         $data = json_decode($this->OriginalUpdate);
         return $data->link;
     }
@@ -165,8 +177,9 @@ class InstagramUpdate extends Page {
      *
      * @return \InstagramUpdate
      */
-    public function expandUpdateData(stdClass $update = null){
-        $data = $update ? json_decode(json_encode($update),true) : json_decode($this->OriginalUpdate,true) ;
+    public function expandUpdateData(stdClass $update = null)
+    {
+        $data = $update ? json_decode(json_encode($update), true) : json_decode($this->OriginalUpdate, true) ;
         $this->customise($data);
         return $this;
     }
@@ -176,13 +189,16 @@ class InstagramUpdate extends Page {
      * @param type $member
      * @return boolean
      */
-    public function canPublish($member = null) {
-        if (Director::is_cli()) return true;
-        else return parent::canPublish($member);
+    public function canPublish($member = null)
+    {
+        if (Director::is_cli()) {
+            return true;
+        } else {
+            return parent::canPublish($member);
+        }
     }
-
 }
 
-class InstagramUpdate_Controller extends Page_Controller {
-
+class InstagramUpdate_Controller extends Page_Controller
+{
 }

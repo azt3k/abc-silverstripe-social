@@ -1,6 +1,7 @@
 <?php
 
-class SocialMediaConfig extends DataExtension {
+class SocialMediaConfig extends DataExtension
+{
 
     private static $db = array(
 
@@ -35,7 +36,8 @@ class SocialMediaConfig extends DataExtension {
         'InstagramPullUpdates'              => 'Boolean'
     );
 
-    public function updateCMSFields(FieldList $fields) {
+    public function updateCMSFields(FieldList $fields)
+    {
 
         // ---------
         // Facebook
@@ -64,7 +66,6 @@ class SocialMediaConfig extends DataExtension {
                 'FacebookBrokenUserConf',
                 '<p style="color:red">Your facebook user configuration is broken (' . $userMsg . ')</p>'
             ));
-
         }
 
         $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('FacebookAppLink', '<p>Manage your apps here: <a href="https://developers.facebook.com/apps/">https://developers.facebook.com/apps/</a></p>'));
@@ -99,7 +100,6 @@ class SocialMediaConfig extends DataExtension {
                 'TwitterBrokenConf',
                 '<p style="color:red">Your twitter configuration is broken</p>'
             ));
-
         }
 
         $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('TwitterAppLink', '<p>Manage your apps here: <a href="https://apps.twitter.com/">https://apps.twitter.com/</a></p>'));
@@ -107,8 +107,9 @@ class SocialMediaConfig extends DataExtension {
         $fields->addFieldsToTab('Root.SocialMedia', new TextField('TwitterConsumerSecret', 'Twitter Consumer Secret'));
 
         // only add the username field if we don't have an auth token
-        if (!$this->owner->TwitterOAuthToken)
+        if (!$this->owner->TwitterOAuthToken) {
             $fields->addFieldsToTab('Root.SocialMedia', new TextField('TwitterUsername', 'Twitter Username (optional)'));
+        }
 
         $fields->addFieldsToTab('Root.SocialMedia', new CheckboxField('TwitterPushUpdates', 'Push publication updates to authorised Twitter account'));
         $fields->addFieldsToTab('Root.SocialMedia', new CheckboxField('TwitterPullUpdates', 'Pull publication updates from authorised Twitter account'));
@@ -133,7 +134,6 @@ class SocialMediaConfig extends DataExtension {
                 'InstagramBrokenConf',
                 '<p style="color:red">Your instagram configuration is broken</p>'
             ));
-
         }
 
         $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('InstagramAppLink', '<p>Manage your apps here: <a href="http://instagr.am/developer/">http://instagr.am/developer/</a></p>'));
@@ -154,22 +154,25 @@ class SocialMediaConfig extends DataExtension {
         $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('InstagramOAuthToken', '<p>OAuth Token</p><p>'.($this->owner->InstagramOAuthToken ? $this->owner->InstagramOAuthToken.' <a href="/InstagramAuthenticator?wipe=1" target="_blank">Wipe</a>' : '<a href="/InstagramAuthenticator?start=1" target="_blank">Authenticate</a>').'</p>'));
 
         return $fields;
-
     }
 
-    public function InstagramPageLink() {
+    public function InstagramPageLink()
+    {
         return SocialHelper::link($this->owner->InstagramUsername, 'instagram');
     }
 
-    public function TwitterPageLink() {
+    public function TwitterPageLink()
+    {
         return SocialHelper::link($this->owner->TwitterUsername, 'twitter');
     }
 
-    public function FacebookUserLink() {
+    public function FacebookUserLink()
+    {
         return SocialHelper::link($this->owner->FacebookUserId, 'facebook');
     }
 
-    public function FacebookPageLink() {
+    public function FacebookPageLink()
+    {
         return SocialHelper::link($this->owner->FacebookPageId, 'facebook', 'page');
     }
 }
