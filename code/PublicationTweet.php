@@ -3,7 +3,8 @@
 /**
  * @author AzT3k
  */
-class PublicationTweet extends DataObject {
+class PublicationTweet extends DataObject
+{
 
     private static $db = array(
         'TweetID' => 'Varchar(255)'
@@ -12,5 +13,4 @@ class PublicationTweet extends DataObject {
     private static $has_one = array(
         'Page' => 'Page'
     );
-
 }

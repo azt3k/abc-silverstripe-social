@@ -3,7 +3,8 @@
 /**
  * @author AzT3k
  */
-class PublicationFBUpdate extends DataObject {
+class PublicationFBUpdate extends DataObject
+{
 
     private static $db = array(
         'FBUpdateID' => 'Varchar(255)'

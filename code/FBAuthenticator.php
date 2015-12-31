@@ -5,7 +5,8 @@ use Facebook\Facebook;
 /**
  * @author AzT3k
  */
-class FBAuthenticator extends Controller {
+class FBAuthenticator extends Controller
+{
 
     private static $allowed_actions = array(
         'index',
@@ -17,14 +18,17 @@ class FBAuthenticator extends Controller {
     protected $conf;
     protected $facebook;
 
-    public static function get_conf() {
-        if (!static::$conf_instance) static::$conf_instance = SiteConfig::current_site_config();
+    public static function get_conf()
+    {
+        if (!static::$conf_instance) {
+            static::$conf_instance = SiteConfig::current_site_config();
+        }
         return static::$conf_instance;
     }
 
-    public static function get_facebook() {
+    public static function get_facebook()
+    {
         if (!static::$facebook_instance) {
-
             $conf = static::get_conf();
 
             static::$facebook_instance = new Facebook(array(
@@ -36,15 +40,16 @@ class FBAuthenticator extends Controller {
         return static::$facebook_instance;
     }
 
-    public function __construct() {
-
+    public function __construct()
+    {
         $this->conf = static::get_conf();
         $this->facebook = static::get_facebook();
 
         parent::__construct();
     }
 
-    public static function getOAuthDialogURL() {
+    public static function getOAuthDialogURL()
+    {
 
         // get the required vars for the dance
         $conf       = static::get_conf();
@@ -52,7 +57,7 @@ class FBAuthenticator extends Controller {
         $app_secret = $conf->FacebookAppSecret;
         $my_url     = SocialHelper::php_self();
 
-        $_SESSION['state'] = md5(uniqid(rand(), TRUE)); //CSRF protection
+        $_SESSION['state'] = md5(uniqid(rand(), true)); //CSRF protection
         $dialog_url =   'http://www.facebook.com/dialog/oauth?'.
                         'client_id='.$app_id.'&'.
                         'redirect_uri='.urlencode($my_url).'&'.
@@ -73,33 +78,34 @@ class FBAuthenticator extends Controller {
                         'state='.$_SESSION['state'];
 
         return $dialog_url;
-
     }
 
-    public static function validate_crsf() {
+    public static function validate_crsf()
+    {
         return $_SESSION['state'] && ($_SESSION['state'] === $_REQUEST['state']);
     }
 
-    public static function purge_auth_tokens() {
+    public static function purge_auth_tokens()
+    {
         $conf = static::get_conf();
         $conf->FacebookUserAccessToken = null;
         $conf->FacebookPageAccessToken = null;
         $conf->write();
     }
 
-    public static function validate_current_conf($validate = array('page','user'))
+    public static function validate_current_conf($validate = array('page', 'user'))
     {
         $userValid = $pageValid = true;
         $conf      = static::get_conf();
         $facebook  = static::get_facebook();
 
-        if ( $validate == 'user' || (is_array($validate) && in_array('user', $validate)) ) {
+        if ($validate == 'user' || (is_array($validate) && in_array('user', $validate))) {
             $facebook->setDefaultAccessToken((string) $conf->FacebookUserAccessToken);
             $userValid = (object) $facebook->sendRequest('get', '/me')->getDecodedBody();
             $userValid = !empty($userValid->id) && $userValid->id == $conf->FacebookUserId ? true : false ;
         }
 
-        if ( $validate == 'page' || (is_array($validate) && in_array('page', $validate)) ) {
+        if ($validate == 'page' || (is_array($validate) && in_array('page', $validate))) {
             $facebook->setDefaultAccessToken((string) $conf->FacebookPageAccessToken);
             $pageValid = (object) $facebook->sendRequest('get', '/me')->getDecodedBody();
             $pageValid = !empty($pageValid->id) && $pageValid->id == $conf->FacebookPageId ? true : false ;
@@ -109,39 +115,49 @@ class FBAuthenticator extends Controller {
             return true;
         } else {
             $msg = '';
-            if (!$pageValid) $msg.= 'Unable to fetch page data; ';
-            if (!$userValid) $msg.= 'Unable to fetch user data; ';
+            if (!$pageValid) {
+                $msg.= 'Unable to fetch page data; ';
+            }
+            if (!$userValid) {
+                $msg.= 'Unable to fetch user data; ';
+            }
             throw new Exception($msg);
             return false;
         }
-
     }
 
-    public function purge(){
+    public function purge()
+    {
 
         // authorise
         $user = Member::currentUser();
-        if (!Permission::checkMember($user, 'ADMIN')) return $this->httpError(401, 'You do not have access to the requested content');
+        if (!Permission::checkMember($user, 'ADMIN')) {
+            return $this->httpError(401, 'You do not have access to the requested content');
+        }
 
         // purge
         static::purge_auth_tokens();
 
         die('Auth tokens purged.<br><br><a href="/FBAuthenticator">Click here to authorise</a>');
-
     }
 
-    public function index() {
+    public function index()
+    {
 
         // authorise
         $user = Member::currentUser();
-        if (!Permission::checkMember($user, 'ADMIN')) return $this->httpError(401, 'You do not have access to the requested content');
+        if (!Permission::checkMember($user, 'ADMIN')) {
+            return $this->httpError(401, 'You do not have access to the requested content');
+        }
 
         // grab the API Lib
         $facebook = static::get_facebook();
 
         // the auth process authorises both a user and a page
         // it might pay to make this a seperate step in future if we decide to add user feeds as well as page feeds
-        if (empty($this->conf->FacebookPageId)) die('Facebook Page ID not supplied');
+        if (empty($this->conf->FacebookPageId)) {
+            die('Facebook Page ID not supplied');
+        }
 
         // if there's a code in the request grab it
         $code = empty($_REQUEST['code']) ? null : $_REQUEST['code'] ;
@@ -169,7 +185,9 @@ class FBAuthenticator extends Controller {
             parse_str($response, $params);
 
             // die if we didn't get the required info
-            if (empty($params['access_token'])) die('couldn\'t get user access token - are you logged in to the correct facebook account?');
+            if (empty($params['access_token'])) {
+                die('couldn\'t get user access token - are you logged in to the correct facebook account?');
+            }
 
             // save the user access token
             $this->conf->FacebookUserAccessToken = $params['access_token'];
@@ -180,17 +198,21 @@ class FBAuthenticator extends Controller {
             $user = (object) static::get_facebook()->sendRequest('get', '/me')->getDecodedBody();
 
             // die if we couldn't get an id
-            if (empty($user->id)) die('couldn\'t access user info');
+            if (empty($user->id)) {
+                die('couldn\'t access user info');
+            }
 
             // save the user ID
             $this->conf->FacebookUserId = $user->id;
             $this->conf->write();
 
             // get an access token for the page
-            $page_info = $facebook->sendRequest('get', '/' . $this->conf->FacebookPageId . "?fields=access_token" )->getDecodedBody();
+            $page_info = $facebook->sendRequest('get', '/' . $this->conf->FacebookPageId . "?fields=access_token")->getDecodedBody();
 
             // die if we didn't get the required info
-            if (empty($page_info['access_token'])) die('couldn\'t get page access token - are you logged in to the correct facebook account and an admin of page ' . $this->conf->FacebookPageId . '?');
+            if (empty($page_info['access_token'])) {
+                die('couldn\'t get page access token - are you logged in to the correct facebook account and an admin of page ' . $this->conf->FacebookPageId . '?');
+            }
 
             // save the page access token
             $this->conf->FacebookPageAccessToken = $page_info['access_token'];
@@ -203,13 +225,8 @@ class FBAuthenticator extends Controller {
             echo '<p>User ' . $this->conf->FacebookUserId . ($freshConf->FacebookUserAccessToken ? ' was authenticated' : ' was not authenticated') . '</p>';
             echo '<p>Page ' . $this->conf->FacebookPageId . ($freshConf->FacebookPageAccessToken ? ' was authenticated' : ' was not authenticated') . '</p>';
             exit;
-
-        }else{
-
+        } else {
             die('crsf error');
-
         }
-
-
     }
 }

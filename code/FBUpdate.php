@@ -6,7 +6,8 @@ use Guzzle\Plugin\History\HistoryPlugin;
 /**
  * @author AzT3k
  */
-class FBUpdate extends Page {
+class FBUpdate extends Page
+{
 
     private static $db = array(
         'UpdateID'          => 'Varchar(255)',
@@ -31,7 +32,8 @@ class FBUpdate extends Page {
      *  @param  array|object $conf An associative array containing the configuration - see static::$conf for an example
      *  @return void
      */
-    public static function set_conf($conf) {
+    public static function set_conf($conf)
+    {
         $conf = (array) $conf;
         static::$conf = array_merge(static::$conf, $conf);
     }
@@ -39,37 +41,44 @@ class FBUpdate extends Page {
     /**
      *  @return stdClass
      */
-    public static function get_conf() {
+    public static function get_conf()
+    {
         return (object) array_merge(static::$defaults, static::$conf);
     }
 
     /**
      * @return void
      */
-    protected static function set_conf_from_yaml() {
+    protected static function set_conf_from_yaml()
+    {
         $conf = (array) Config::inst()->get(__CLASS__, 'conf');
-        if (!empty($conf))
+        if (!empty($conf)) {
             static::$conf = array_merge(static::$conf, $conf);
+        }
     }
 
     /**
      *  @return void
      */
-    protected function configure() {
+    protected function configure()
+    {
         static::set_conf_from_yaml();
     }
 
-    public function __construct($record = null, $isSingleton = false, $model = null) {
+    public function __construct($record = null, $isSingleton = false, $model = null)
+    {
         parent::__construct($record, $isSingleton, $model);
         $this->configure();
     }
 
-    public function onBeforeWrite() {
+    public function onBeforeWrite()
+    {
         parent::onBeforeWrite();
         $this->findParent();
     }
 
-    public function findParent() {
+    public function findParent()
+    {
         if (!$this->ParentID) {
             $conf = static::get_conf();
             if (!$parent = DataObject::get_one($conf->holder_class)) {
@@ -81,8 +90,8 @@ class FBUpdate extends Page {
         }
     }
 
-    public function resolveUrl($url) {
-
+    public function resolveUrl($url)
+    {
         $client   = new GuzzleClient($url);
         $history  = new HistoryPlugin();
         $client->addSubscriber($history);
@@ -96,7 +105,8 @@ class FBUpdate extends Page {
         return $response->getEffectiveUrl();
     }
 
-    public function updateFromUpdate(stdClass $update, $save = true) {
+    public function updateFromUpdate(stdClass $update, $save = true)
+    {
 
         // print_r($update);
         $pageid = SiteConfig::current_site_config()->FacebookPageId;
@@ -118,7 +128,9 @@ class FBUpdate extends Page {
             $img = $picUrl;
 
             // sanity check
-            if (!is_dir(ASSETS_PATH . '/social-updates/')) mkdir(ASSETS_PATH . '/social-updates/');
+            if (!is_dir(ASSETS_PATH . '/social-updates/')) {
+                mkdir(ASSETS_PATH . '/social-updates/');
+            }
 
             // prep img data
             $noq = explode('?', $img);
@@ -145,7 +157,9 @@ class FBUpdate extends Page {
                 }
 
                 // associate
-                if ($image->ID) $this->PrimaryImageID = $image->ID;
+                if ($image->ID) {
+                    $this->PrimaryImageID = $image->ID;
+                }
             }
         }
 
@@ -159,15 +173,13 @@ class FBUpdate extends Page {
             : $update->message;
 
         if (!$content) {
-            echo 'Encountered error with: ' . print_r($update,1);
+            echo 'Encountered error with: ' . print_r($update, 1);
             return false;
-        }
-        else {
-
+        } else {
             $this->Title                = 'Facebook Update - ' . $update->id;
             $this->URLSegment           = 'FBUpdate-' . $update->id;
             $this->UpdateID             = $update->id;
-            $this->OriginalCreated      = date('Y-m-d H:i:s',strtotime($update->created_time));
+            $this->OriginalCreated      = date('Y-m-d H:i:s', strtotime($update->created_time));
             $this->Content              = $content;
             $this->OriginalUpdate       = json_encode($update);
 
@@ -175,24 +187,23 @@ class FBUpdate extends Page {
 
             return $save ? $this->write() : true ;
         }
-
     }
 
-    public function getCMSFields() {
-
+    public function getCMSFields()
+    {
         $fields = parent::getCMSFields();
 
         $lastEditedDateField = new DateTimeField('OriginalCreated');
         $lastEditedDateField->setConfig('showcalendar', true);
         $fields->addFieldToTab('Root.Main', $lastEditedDateField, 'Content');
 
-        $fields->addFieldToTab('Root.Original', new LiteralField('OriginalUpdate', str_replace("\n", '<br>', print_r($this->OriginalUpdate,1))));
+        $fields->addFieldToTab('Root.Original', new LiteralField('OriginalUpdate', str_replace("\n", '<br>', print_r($this->OriginalUpdate, 1))));
 
         return $fields;
-
     }
 
-    public function OriginalLink() {
+    public function OriginalLink()
+    {
         $id = SiteConfig::current_site_config()->FacebookPageId;
         return 'https://www.facebook.com/' .
             $id .
@@ -205,9 +216,9 @@ class FBUpdate extends Page {
      *
      * @return \FBUpdate
      */
-    public function expandUpdateData(stdClass $update = null){
-
-        $data = $update ? json_decode(json_encode($update),true) : json_decode($this->OriginalUpdate,true) ;
+    public function expandUpdateData(stdClass $update = null)
+    {
+        $data = $update ? json_decode(json_encode($update), true) : json_decode($this->OriginalUpdate, true) ;
 
         $this->customise($data);
 
@@ -219,13 +230,16 @@ class FBUpdate extends Page {
      * @param type $member
      * @return boolean
      */
-    public function canPublish($member = null) {
-        if (Director::is_cli()) return true;
-        else return parent::canPublish($member);
+    public function canPublish($member = null)
+    {
+        if (Director::is_cli()) {
+            return true;
+        } else {
+            return parent::canPublish($member);
+        }
     }
-
 }
 
-class FBUpdate_Controller extends Page_Controller {
-
+class FBUpdate_Controller extends Page_Controller
+{
 }
