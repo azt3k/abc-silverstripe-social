@@ -4,7 +4,7 @@ class SocialMediaConfig extends DataExtension {
 
     private static $db = array(
 
-        'FacebookAppId'                      => 'Varchar(255)',
+        'FacebookAppId'                     => 'Varchar(255)',
         'FacebookAppSecret'                 => 'Varchar(255)',
         'FacebookUserId'                    => 'Varchar(255)',
         'FacebookUserAccessToken'           => 'Varchar(255)',
@@ -13,6 +13,7 @@ class SocialMediaConfig extends DataExtension {
         'FacebookPageAccessToken'           => 'Varchar(255)',
         'FacebookPageAccessTokenExpires'    => 'SS_DateTime',
         'FacebookPageLink'                  => 'Varchar(255)',
+        'FacebookPageFeedType'              => 'Enum(\'feed,posts,tagged,promotable_posts\',\'feed\')',
         'FacebookPushUpdates'               => 'Boolean',
         'FacebookPullUpdates'               => 'Boolean',
 
