@@ -68,22 +68,26 @@ class SocialMediaConfig extends DataExtension {
 
         }
 
-        $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('FacebookAppLink', '<p>Manage your apps here: <a href="https://developers.facebook.com/apps/">https://developers.facebook.com/apps/</a></p>'));
-        $fields->addFieldsToTab('Root.SocialMedia', new LiteralField('FacebookIDLink', '<p>Find your Facebook IDs here: <a href="http://findmyfbid.com/">http://findmyfbid.com/</a></p>'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new TextField('FacebookAppId', 'Facebook App Id'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new TextField('FacebookAppSecret', 'Facebook App Secret'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new TextField('FacebookUserId', 'Facebook User Id'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new TextField('FacebookPageId', 'Facebook Page Id'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new CheckboxField('FacebookPushUpdates', 'Push publication updates to authorised Facebook account'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new CheckboxField('FacebookPullUpdates', 'Pull publication updates from authorised Facebook account'));
-
-        $fields->addFieldsToTab('Root.SocialMedia',    new LiteralField('FacebookUserData', '<h4>Facebook User</h4>'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new LiteralField('FacebookUserLink', '<p><a target="_blank" href="' . $this->FacebookUserLink(). '">' . $this->owner->FacebookUserId . '</a></p>'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new LiteralField('FacebookUserAccessToken', '<p>Facebook User Access Token</p><p>'.($this->owner->FacebookUserAccessToken ? $this->owner->FacebookUserAccessToken.' <a href="/FBAuthenticator/purge" target="_blank">Wipe</a>' : '<a href="/FBAuthenticator" target="_blank">Authenticate</a>').'</p>'));
-
-        $fields->addFieldsToTab('Root.SocialMedia',    new LiteralField('FacebookPageData', '<h4>Facebook Page</h4>'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new LiteralField('FacebookPageLink', '<p><a target="_blank" href="' . $this->FacebookPageLink(). '">' . $this->owner->FacebookPageId . '</a></p>'));
-        $fields->addFieldsToTab('Root.SocialMedia',    new LiteralField('FacebookPageAccessToken', '<p>Facebook Page Access Token</p><p>'.($this->owner->FacebookPageAccessToken ? $this->owner->FacebookPageAccessToken.' <a href="/FBAuthenticator/purge" target="_blank">Wipe</a>' : '<a href="/FBAuthenticator" target="_blank">Authenticate</a>').'</p>'));
+        $fields->addFieldsToTab(
+            'Root.SocialMedia',
+            array(
+                new LiteralField('FacebookAppLink', '<p>Manage your apps here: <a href="https://developers.facebook.com/apps/">https://developers.facebook.com/apps/</a></p>'),
+                new LiteralField('FacebookIDLink', '<p>Find your Facebook IDs here: <a href="http://findmyfbid.com/">http://findmyfbid.com/</a></p>'),
+                new TextField('FacebookAppId', 'Facebook App Id'),
+                new TextField('FacebookAppSecret', 'Facebook App Secret'),
+                new TextField('FacebookUserId', 'Facebook User Id'),
+                new TextField('FacebookPageId', 'Facebook Page Id'),
+                new DropdownField('FacebookPageFeedType', 'Facebook Page Feed Type', $this->owner->dbObject('FacebookPageFeedType')->enumValues()),
+                new CheckboxField('FacebookPushUpdates', 'Push publication updates to authorised Facebook account'),
+                new CheckboxField('FacebookPullUpdates', 'Pull publication updates from authorised Facebook account'),
+                new LiteralField('FacebookUserData', '<h4>Facebook User</h4>'),
+                new LiteralField('FacebookUserLink', '<p><a target="_blank" href="' . $this->FacebookUserLink(). '">' . $this->owner->FacebookUserId . '</a></p>'),
+                new LiteralField('FacebookUserAccessToken', '<p>Facebook User Access Token</p><p>'.($this->owner->FacebookUserAccessToken ? $this->owner->FacebookUserAccessToken.' <a href="/FBAuthenticator/purge" target="_blank">Wipe</a>' : '<a href="/FBAuthenticator" target="_blank">Authenticate</a>').'</p>'),
+                new LiteralField('FacebookPageData', '<h4>Facebook Page</h4>'),
+                new LiteralField('FacebookPageLink', '<p><a target="_blank" href="' . $this->FacebookPageLink(). '">' . $this->owner->FacebookPageId . '</a></p>'),
+                new LiteralField('FacebookPageAccessToken', '<p>Facebook Page Access Token</p><p>'.($this->owner->FacebookPageAccessToken ? $this->owner->FacebookPageAccessToken.' <a href="/FBAuthenticator/purge" target="_blank">Wipe</a>' : '<a href="/FBAuthenticator" target="_blank">Authenticate</a>').'</p>'),
+            )
+        );
 
         // ---------
         // Twitter
