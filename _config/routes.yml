@@ -6,4 +6,4 @@ Director:
   rules:
     TwitterAuthenticator: TwitterAuthenticator
     FBAuthenticator: FBAuthenticator
-    InstragramAuthenticator: InstragramAuthenticator
+    InstagramAuthenticator: InstagramAuthenticator
