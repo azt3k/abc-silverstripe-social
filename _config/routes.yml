@@ -1,0 +1,9 @@
+---
+Name: abc-silverstripe-social-routes
+After: framework/routes#coreroutes
+---
+Director:
+  rules:
+    TwitterAuthenticator: TwitterAuthenticator
+    FBAuthenticator: FBAuthenticator
+    InstragramAuthenticator: InstragramAuthenticator
