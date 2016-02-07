@@ -180,6 +180,38 @@ class Tweet extends Page {
         else return parent::canPublish($member);
     }
 
+    /**
+     * Parses the tokens out of the html
+     */
+    public function Content() {
+
+        // links
+        $text = preg_replace(
+            '@(https?://([-\w\.]+)+(/([\w/_\.]*(\?\S+)?(#\S+)?)?)?)@',
+             '<a href="$1">$1</a>',
+            $this->Content
+        );
+
+        // users
+        $text = preg_replace(
+            '/@(\w+)/',
+            '<a href="http://twitter.com/$1">@$1</a>',
+            $text
+        );
+
+        // hashtags
+        $text = preg_replace(
+            '/\s+#(\w+)/',
+            ' <a href="http://search.twitter.com/search?q=%23$1">#$1</a>',
+            $text
+        );
+
+        return DBField::create_field(
+            'HTMLText',
+            $text
+        );
+    }
+
 }
 
 class Tweet_Controller extends Page_Controller {
