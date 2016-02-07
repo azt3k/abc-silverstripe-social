@@ -33,10 +33,42 @@ class SocialMediaConfig extends DataExtension {
         'InstagramUsername'                 => 'Varchar(255)',
         'InstagramUserId'                   => 'Varchar(255)',
         'InstagramPushUpdates'              => 'Boolean',
-        'InstagramPullUpdates'              => 'Boolean'
+        'InstagramPullUpdates'              => 'Boolean',
+    );
+
+    private static $has_one = array(
+        'DefaultImage'                      => 'Image',
+        'DefaultFBUpdateImage'              => 'Image',
+        'DefaultTweetImage'                 => 'Image',
+        'DefaultInstagramUpdateImage'       => 'Image',
     );
 
     public function updateCMSFields(FieldList $fields) {
+
+
+        // ---------
+        // Images
+        // ---------
+
+        // Image
+        $imageField = new UploadField('DefaultImage', 'DefaultImage');
+        $imageField->getValidator()->setAllowedExtensions(array('jpg','jpeg','gif','png'));
+        $fields->addFieldToTab('Root.Images', $imageField);
+
+        // Image
+        $fbImageField = new UploadField('DefaultFBUpdateImage', 'Default Facebook Image');
+        $fbImageField->getValidator()->setAllowedExtensions(array('jpg','jpeg','gif','png'));
+        $fields->addFieldToTab('Root.Images', $fbImageField);
+
+        // Image
+        $tweetImageField = new UploadField('DefaultTweetImage', 'Default Twitter Image');
+        $tweetImageField->getValidator()->setAllowedExtensions(array('jpg','jpeg','gif','png'));
+        $fields->addFieldToTab('Root.Images', $tweetImageField);
+
+        // Image
+        $instagramImageField = new UploadField('DefaultInstagramImage', 'Default Instagram Image');
+        $instagramImageField->getValidator()->setAllowedExtensions(array('jpg','jpeg','gif','png'));
+        $fields->addFieldToTab('Root.Images', $instagramImageField);
 
         // ---------
         // Facebook
