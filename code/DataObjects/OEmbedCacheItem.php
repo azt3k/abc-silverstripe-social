@@ -12,25 +12,69 @@ class OEmbedCacheItem extends DataObject {
 	);
 
 	public function data() {
-		return json_decode($this->Response);
+		return $this->Response ? json_decode($this->Response) : null;
 	}
 
-	public static function fetch($url) {
+	public static function fetch($conf) {
+
+		// handle embeds with no service attr
+		if (empty($conf['service'])) {
+			if (stripos($conf['url'], 'facebook.com') !== false)
+				$conf['service'] = 'facebook';
+			if (stripos($conf['url'], 'twitter.com') !== false)
+				$conf['service'] = 'twitter';
+			if (stripos($conf['url'], 'instagr.am') !== false || stripos($conf['url'], 'instagram.com') !== false)
+				$conf['service'] = 'instagram';
+		}
+
+		// generate the url
+		switch ($conf['service']) {
+
+			// $type == 'video' || $type == ????
+			case 'twitter':
+				$type = empty($conf['type']) ? 'tweet' : $conf['type'];
+				$url = 'https://api.twitter.com/1/statuses/oembed.json' .
+					'?url=' . rawurlencode($conf['url']) .
+					'&widget_type=' . $type;
+				break;
+
+			// $type == 'video' || $type == 'post'
+			case 'facebook':
+				$type = empty($conf['type']) ? 'post' : $conf['type'];
+				$url = 'https://www.facebook.com/plugins/' . $type . '/oembed.json' .
+					'?url=' . rawurlencode($conf['url']);
+				break;
+
+			// $type == void
+			case 'instagram':
+			$url = 'https://api.instagram.com/oembed' .
+				'?url=' . rawurlencode($conf['url']);
+				break;
+		}
 
 		// try to get the  item
 		if (!$item = self::get()->filter(array('URL' => $url))->first()) {
 
+			// omg facebook...
+			// spoof the user agent header or FB packs a sad
+			$options  = array(
+				'http' => array(
+					'user_agent' => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:43.0) Gecko/20100101 Firefox/43.0'
+				)
+			);
+			$context  = stream_context_create($options);
+
 			// fetch the oEmbed
-			$raw = file_get_contents($url);
+			$raw = file_get_contents($url, false, $context);
 			if (!$raw) return false;
 
 			// save it
-			$item = self::create()->update(array(
-				'URL' => $url,
-				'Response' => $raw,
-			));
-
-			$item->write();
+			self::create()
+				->update(array(
+					'URL' => $url,
+					'Response' => $raw,
+				))
+				->write();
 		}
 
 		return $item;

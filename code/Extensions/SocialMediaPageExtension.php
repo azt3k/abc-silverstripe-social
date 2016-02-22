@@ -34,19 +34,17 @@ class SocialMediaPageExtension extends DataExtension {
 
     /**
      * parses out short codes:
-     * [social_embed,service="twitter",id="507185938620219395"]
+     * [social_embed,service="twitter",url="https://twitter.com/nytimes/status/701590150434967553"]
+     * [social_embed,service="facebook",url="https://www.facebook.com/telesurenglish/photos/a.492297374247003.1073741828.479681268841947/791129364363801/"]
+     * [social_embed,service="instagram",url="https://www.instagram.com/p/BCEoPpwDw-t/"]
      * @param [type] $arguments [description]
      * @param [type] $content   [description]
      * @param [type] $parser    [description]
      * @param [type] $tagName   [description]
      */
     public static function SocialEmbedParser($arguments, $content = null, $parser = null, $tagName) {
-        if ($tagName == 'social_embed') {
-            switch ($arguments['service']) {
-                case 'twitter':
-                    $url = 'https://api.twitter.com/1/statuses/oembed.json?id=' . $arguments['id'];
-                    if ($embed = OEmbedCacheItem::fetch($url)) return $embed->data()->html;
-            }
+        if ($embed = OEmbedCacheItem::fetch($arguments)) {
+            if ($data = $embed->data()) return $data->html;
         }
         return null;
     }
