@@ -9,14 +9,7 @@
             ed.addCommand('mceInsertSocialEmbed', function() {
                 ed.windowManager.open({
                     title: 'Social Embed',
-                    url: url + '/js/editor-plugin.html',
-                    body: [
-                        {type: 'textbox', name: 'url', label: 'URL'}
-                    ],
-                    onsubmit: function(e) {
-                        // Insert content when the window form is submitted
-                        editor.insertContent('[social_embed,url=' + e.data.url + ']');
-                    }
+                    url: url + '/editor-plugin.html'
                 });
             });
 
