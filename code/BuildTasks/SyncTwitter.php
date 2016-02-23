@@ -67,7 +67,7 @@ class SyncTwitter extends BuildTask implements CronTask{
         // output
         echo "<br />\n<br />\nSyncing...<br />\n<br />\n";
         flush();
-        ob_flush();
+        @ob_flush();
 
         if (!$this->conf->TwitterPullUpdates) {
             echo "Sync disabled <br />\n<br />\n";
@@ -111,7 +111,7 @@ class SyncTwitter extends BuildTask implements CronTask{
                     //output
                     echo "<br />\n<br />\nDoing initial Population<br />\n<br />\n";
                     flush();
-                    ob_flush();
+                    @ob_flush();
 
                      // keep going until we hit a problem
                      while ($code == 200 && count($resp)) {
@@ -153,7 +153,7 @@ class SyncTwitter extends BuildTask implements CronTask{
                     // output
                     echo "Finished";
                     flush();
-                    ob_flush();
+                    @ob_flush();
                 }
 
             } else {
@@ -161,7 +161,7 @@ class SyncTwitter extends BuildTask implements CronTask{
                 // output
                 echo "No hits <br />\n<br />\n";
                 flush();
-                ob_flush();
+                @ob_flush();
 
             }
 
@@ -184,7 +184,7 @@ class SyncTwitter extends BuildTask implements CronTask{
                     // push output
                     echo "Adding Tweet ".$tweetData->id_str."<br />\n";
                     flush();
-                    ob_flush();
+                    @ob_flush();
 
                     // create the tweet data object
                     $tweet = new Tweet;
@@ -200,7 +200,7 @@ class SyncTwitter extends BuildTask implements CronTask{
                     // push output
                     echo "Tweet ".$tweetData->id_str." came from the website<br />\n";
                     flush();
-                    ob_flush();
+                    @ob_flush();
 
                 }
 
@@ -211,7 +211,7 @@ class SyncTwitter extends BuildTask implements CronTask{
                 // push output
                 echo "Already added Tweet ".$tweetData->id_str."<br />\n";
                 flush();
-                ob_flush();
+                @ob_flush();
 
             }
         }

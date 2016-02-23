@@ -77,7 +77,7 @@ class SyncFacebook extends BuildTask implements CronTask {
         // output
         echo "<br />\n<br />\nSyncing...<br />\n<br />\n";
         flush();
-        ob_flush();
+        @ob_flush();
 
         if (!$this->conf->FacebookPullUpdates) {
             echo "Sync disabled <br />\n<br />\n";
@@ -111,7 +111,7 @@ class SyncFacebook extends BuildTask implements CronTask {
                 //output
                 echo "<br />\n<br />\nDoing initial Population<br />\n<br />\n";
                 flush();
-                ob_flush();
+                @ob_flush();
 
                 // keep going until we hit a problem
                 while (count($resp)) {
@@ -151,7 +151,7 @@ class SyncFacebook extends BuildTask implements CronTask {
                         // output
                         echo "No more pages <br />\n<br />\n";
                         flush();
-                        ob_flush();
+                        @ob_flush();
                         break;
                     }
 
@@ -160,7 +160,7 @@ class SyncFacebook extends BuildTask implements CronTask {
                 // output
                 echo "Finished\n";
                 flush();
-                ob_flush();
+                @ob_flush();
             }
 
         } else {
@@ -168,7 +168,7 @@ class SyncFacebook extends BuildTask implements CronTask {
             // output
             echo "No hits <br /><br />\n";
             flush();
-            ob_flush();
+            @ob_flush();
 
         }
 
@@ -189,7 +189,7 @@ class SyncFacebook extends BuildTask implements CronTask {
                     // push output
                     echo "Adding Update ".$data->id."<br />\n";
                     flush();
-                    ob_flush();
+                    @ob_flush();
 
                     // get extended info
                     // $res = (object) $this->facebook->sendRequest('get', '/' . $data->id)->getDecodedBody();
@@ -214,7 +214,7 @@ class SyncFacebook extends BuildTask implements CronTask {
                     // push output
                     echo "Update ".$data->id." came from the website<br />\n";
                     flush();
-                    ob_flush();
+                    @ob_flush();
 
                 }
             } else {
@@ -224,7 +224,7 @@ class SyncFacebook extends BuildTask implements CronTask {
                 // push output
                 echo "Already added Update ".$data->id."<br />\n";
                 flush();
-                ob_flush();
+                @ob_flush();
 
             }
         }

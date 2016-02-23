@@ -63,7 +63,7 @@ class SyncInstagram extends BuildTask implements CronTask{
         // output
         echo "<br />\n<br />\nSyncing...<br />\n<br />\n";
         flush();
-        ob_flush();
+        @ob_flush();
 
         if (!$this->conf->InstagramPullUpdates) {
             echo "Sync disabled <br />\n<br />\n";
@@ -95,7 +95,7 @@ class SyncInstagram extends BuildTask implements CronTask{
                     //output
                     echo "<br />\n<br />\nDoing initial Population<br />\n<br />\n";
                     flush();
-                    ob_flush();
+                    @ob_flush();
 
                     // keep going until we hit a problem
                     while ($updates = $this->instagram->pagination($updates)) {
@@ -110,7 +110,7 @@ class SyncInstagram extends BuildTask implements CronTask{
                     // output
                     echo "Finished";
                     flush();
-                    ob_flush();
+                    @ob_flush();
                 }
 
             } else {
@@ -118,7 +118,7 @@ class SyncInstagram extends BuildTask implements CronTask{
                 // output
                 echo "No hits <br />\n<br />\n";
                 flush();
-                ob_flush();
+                @ob_flush();
 
             }
         }
@@ -138,7 +138,7 @@ class SyncInstagram extends BuildTask implements CronTask{
                     // push output
                     echo "Adding InstagramUpdate " . $data->id . "<br />\n";
                     flush();
-                    ob_flush();
+                    @ob_flush();
 
                     // create update
                     $update = new InstagramUpdate;
@@ -160,7 +160,7 @@ class SyncInstagram extends BuildTask implements CronTask{
                     // push output
                     echo "InstagramUpdate ".$data->id." came from the website<br />\n";
                     flush();
-                    ob_flush();
+                    @ob_flush();
 
                 }
 
@@ -171,7 +171,7 @@ class SyncInstagram extends BuildTask implements CronTask{
                 // push output
                 echo "Already added InstagramUpdate ".$data->id."<br />\n";
                 flush();
-                ob_flush();
+                @ob_flush();
 
             }
         }

@@ -14,6 +14,7 @@ class SocialHelper extends Object {
      */
     public static function php_self($dropqs = true) {
 
+        // figure out what the protocol is
         $protocol = 'http';
 
         if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on')
@@ -22,9 +23,16 @@ class SocialHelper extends Object {
         elseif (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == '443'))
             $protocol = 'https';
 
-        $url    = sprintf('%s://%s%s', $protocol, $_SERVER['SERVER_NAME'], $_SERVER['REQUEST_URI']);
+        // figure out what the server name is
+        $serverName = empty($_SERVER['SERVER_NAME']) ? 'localhost' : $_SERVER['SERVER_NAME'];
+
+        // figure out what the port is
+        $port = empty($_SERVER['SERVER_PORT']) ? 80 : $_SERVER['SERVER_PORT'];
+
+        // build the uri
+        $url    = sprintf('%s://%s%s', $protocol, $serverName, $_SERVER['REQUEST_URI']);
         $parts  = parse_url($url);
-        $port   = $_SERVER['SERVER_PORT'];
+        $port   = $port;
         $scheme = $parts['scheme'];
         $host   = $parts['host'];
         $path   = @$parts['path'];
