@@ -210,7 +210,7 @@ class SocialMediaPageExtension extends DataExtension {
     public function ShareUrl($service = 'facebook') {
 
         $conf       = SiteConfig::current_site_config();
-        $img        = rawurlencode($this->owner->ImageWithFallback()->AbsoluteURL);
+        $img        = ($img = $this->owner->ImageWithFallback()) ? rawurlencode($img->AbsoluteURL) : null;
         $share_url  = rawurlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
         $title      = rawurlencode($this->owner->Title);
         $src        = rawurlencode($conf->Title);
