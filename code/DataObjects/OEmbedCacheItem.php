@@ -15,7 +15,7 @@ class OEmbedCacheItem extends DataObject {
 		return $this->Response ? json_decode($this->Response) : null;
 	}
 
-	public static function fetch($conf) {
+	public static function fetch($conf, $nocache = false) {
 
 		// handle embeds with no service attr
 		if (empty($conf['service'])) {
@@ -26,6 +26,9 @@ class OEmbedCacheItem extends DataObject {
 			if (stripos($conf['url'], 'instagr.am') !== false || stripos($conf['url'], 'instagram.com') !== false)
 				$conf['service'] = 'instagram';
 		}
+
+		// abort if we dont have what we need
+		if (empty($conf['service'])) return null;
 
 		// generate the url
 		switch ($conf['service']) {
@@ -53,7 +56,10 @@ class OEmbedCacheItem extends DataObject {
 		}
 
 		// try to get the  item
-		if (!$item = self::get()->filter(array('URL' => $url))->first()) {
+		if (!$nocache) $item = self::get()->filter(array('URL' => $url))->first();
+
+		// if the item doesn't exist or we are bypassing the cache
+		if (empty($item)) {
 
 			// omg facebook...
 			// spoof the user agent header or FB packs a sad
@@ -68,13 +74,16 @@ class OEmbedCacheItem extends DataObject {
 			$raw = file_get_contents($url, false, $context);
 			if (!$raw) return false;
 
-			// save it
-			self::create()
-				->update(array(
-					'URL' => $url,
-					'Response' => $raw,
-				))
-				->write();
+			// create item
+			$item = self::create()->update(array(
+				'URL' => $url,
+				'Response' => $raw,
+			));
+
+			// save it if nocache isn't present
+			if (!$nocache) {
+				$item->write();
+			}
 		}
 
 		return $item;

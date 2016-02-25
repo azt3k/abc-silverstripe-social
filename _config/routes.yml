@@ -7,3 +7,4 @@ Director:
     TwitterAuthenticator: TwitterAuthenticator
     FBAuthenticator: FBAuthenticator
     InstagramAuthenticator: InstagramAuthenticator
+    abc-social-admin: SocialAdmin
