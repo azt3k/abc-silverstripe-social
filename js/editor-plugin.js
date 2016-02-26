@@ -40,7 +40,7 @@
             // replace the markup with the short code on save
             // this seems to happen a lot - as in more often than just on save
             ed.onSaveContent.add(function(ed, o) {
-                var $content = $('<div>' + ed.getContent() + '</div>');
+                var $content = $('<div>' + o.content + '</div>');
 
                 // transform the embeds back to short codes
                 $content.find('.social-embed').each(function() {
@@ -58,7 +58,7 @@
                 $content.find('#fb-root').remove();
 
                 // alert($('<div />').append($content).html());
-                ed.setContent($content.html());
+                o.content = $content.html();
             });
 
             // replace the short code with markup on load
@@ -80,8 +80,12 @@
                             m2 = /url="([^"]+)"/.exec(mCur);
                             url = m2[1];
 
+                        console.log(url);
+
                         // get the fully parsed piece of html
                         $.get('/abc-social-admin/htmlfragment?pUrl=' + url, function(data) {
+
+                            // console.log(data);
 
                             // generate the token and the replacement html
                             var token = '[social_embed,url="' + url + '"]',
@@ -90,6 +94,7 @@
                                         '</div>';
 
                             // replace
+                            // this seems to create multiple requests as we are setting content in onSetContent callback
                             ed.setContent(ed.getContent().replace(mCur, data));
 
                             // // call the parsers
