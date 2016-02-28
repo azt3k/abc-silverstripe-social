@@ -5,8 +5,8 @@
 
             var self = this;
 
+            // inject the widget scripts into the editor document
             ed.onBeforeSetContent.add(function(ed, o) {
-                // inject some scripts
                 var head = ed.contentDocument.getElementsByTagName('head')[0],
                     s = [
                         '//platform.twitter.com/widgets.js',
@@ -51,13 +51,11 @@
                 });
 
                 // do some cleanup
+                $content.find('#rufous-sandbox').closest('p').remove();
                 $content.find('#rufous-sandbox').remove();
-                $content.find('iframe#fb').remove();
-                $content.find('#fb_xdm_frame_http').remove();
-                $content.find('#fb_xdm_frame_https').remove();
                 $content.find('#fb-root').remove();
 
-                // alert($('<div />').append($content).html());
+                // set the content;
                 o.content = $content.html();
             });
 
@@ -67,41 +65,51 @@
 
                 // parse the content
                 var re = /\[social_embed,url="([^"]+)"\]/gi,
-                    m = ed.getContent().match(re),
-                    i;
+                    m = ed.getContent().match(re);
 
                 if (m) {
+
+                    // handle m
+                    var mCount = m.length,
+                        rCount = 0,
+                        rMap = {},
+                        i;
 
                     // find all the matched
                     for (i=0; i < m.length; i++) {
 
                         // extract the match data
                         var mCur = m[i],
-                            m2 = /url="([^"]+)"/.exec(mCur);
+                            m2 = /url="([^"]+)"/.exec(mCur),
                             url = m2[1];
 
-                        console.log(url);
-
                         // get the fully parsed piece of html
-                        $.get('/abc-social-admin/htmlfragment?pUrl=' + url, function(data) {
+                        $.get('/abc-social-admin/htmlfragment?pUrl=' + url, function(mCur, url, data, textStatus, jqXHR) {
 
-                            // console.log(data);
+                            // increment the request counter
+                            rCount++;
 
                             // generate the token and the replacement html
-                            var token = '[social_embed,url="' + url + '"]',
+                            var ii,
+                                token = '[social_embed,url="' + url + '"]',
                                 data =  '<div class="social-embed" data-shortcode="' + token.replace(/"/g, '\'') + '">' +
                                             data +
                                         '</div>';
 
-                            // replace
-                            // this seems to create multiple requests as we are setting content in onSetContent callback
-                            ed.setContent(ed.getContent().replace(mCur, data));
+                            // store the replacement data
+                            rMap[mCur] = data;
 
-                            // // call the parsers
-                            // $(ed.contentWindow).on('load', function() {
-                            //     ed.contentWindow.twttr.widgets.load(ed.getContent());
-                            // });
-                        });
+                            // do the replacement once we get back all of the requests
+                            if (rCount == mCount) {
+                                var cont = ed.getContent();
+                                for (ii=0; ii < m.length; ii++) {
+                                    var key = m[ii];
+                                    cont = cont.replace(key, rMap[key]);
+                                }
+                                ed.setContent(cont);
+                            }
+
+                        }.bind(null, mCur, url));
                     }
                 }
             });
