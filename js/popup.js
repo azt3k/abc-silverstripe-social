@@ -29,7 +29,8 @@
                                 '<div class="social-embed" data-shortcode="' + token.replace(/"/g, '\'') + '">' +
                                     data +
                                 '</div>' +
-                            '</div>';
+                            '</div>' +
+                            '<p>&nbsp;</p>'; // makes it so that they user can escape out of the injected content
 
                 // insert the content
                 tinyMCEPopup.execCommand('mceInsertContent', false, data);
