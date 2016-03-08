@@ -9,7 +9,6 @@
 
             // make a get request to the html endpoint
             $.get('/abc-social-admin/htmlfragment?nocache=1&pUrl=' + encodeURI($el.val()), function(data) {
-                // $('#preview')[0].innerHTML = data;
                 $('#preview').html(data);
             });
         });
@@ -24,8 +23,12 @@
 
                 // generate the token and the replacement html
                 var token = '[social_embed,url="' + $('#url').val() + '"]',
-                    data =  '<div class="social-embed" data-shortcode="' + token.replace(/"/g, '\'') + '">' +
-                                data +
+                    // See editor plugin - it parses out <div class="social-embed"></div> with the short code
+                    // we wrap it in a secondary div otherwise jQuery freak when it tries to parse the raw shortcode
+                    data =  '<div>' +
+                                '<div class="social-embed" data-shortcode="' + token.replace(/"/g, '\'') + '">' +
+                                    data +
+                                '</div>' +
                             '</div>';
 
                 // insert the content
