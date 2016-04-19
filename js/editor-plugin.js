@@ -55,8 +55,14 @@
                 $content.find('#rufous-sandbox').remove();
                 $content.find('#fb-root').remove();
 
+                // get the content string
+                var content = $content.html();
+
+                // make sure we don't have a bung p tag
+                if (content.replace(/^\s+|\s+$/g, '') == '<p>&nbsp;</p>') content = '';
+
                 // set the content;
-                o.content = $content.html();
+                o.content = content;
             });
 
             // replace the short code with markup on load
