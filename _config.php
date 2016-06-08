@@ -16,11 +16,13 @@ Tweet::add_extension('SocialUpdatePageExtension');
 InstagramUpdate::add_extension('SocialUpdatePageExtension');
 
 // add the embed functionality
-ShortcodeParser::get('default')->register('social_embed', array('SocialMediaPageExtension', 'SocialEmbedParser'));
-HtmlEditorConfig::get('cms')->enablePlugins(array(
-    'social_embed' => '../../../' . ABC_SOCIAL_DIR . '/js/editor-plugin.js'
-));
-HtmlEditorConfig::get('cms')->addButtonsToLine(2, 'social_embed');
+if (!Config::inst()->get('SocialGlobalConf', 'disable_wysiwyg_embed')) {
+    ShortcodeParser::get('default')->register('social_embed', array('SocialMediaPageExtension', 'SocialEmbedParser'));
+    HtmlEditorConfig::get('cms')->enablePlugins(array(
+        'social_embed' => '../../../' . ABC_SOCIAL_DIR . '/js/editor-plugin.js'
+    ));
+    HtmlEditorConfig::get('cms')->addButtonsToLine(2, 'social_embed');
+}
 
 // allow script tags
 // maybe we could try using requirements and stripping the script tags
