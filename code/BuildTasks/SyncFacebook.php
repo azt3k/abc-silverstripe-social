@@ -95,7 +95,7 @@ class SyncFacebook extends BuildTask implements CronTask {
         $initPop = $lastUpdate ? false : true ;
 
         // get updates
-        $resp = (object) $this->facebook->sendRequest('get', '/' . $this->conf->FacebookPageId . '/feed')->getDecodedBody();
+        $resp = (object) $this->facebook->sendRequest('get', '/' . $this->conf->FacebookPageId . '/' . $this->conf->FacebookPageFeedType)->getDecodedBody();
 
         // die(print_r($resp,1));
 
@@ -131,7 +131,11 @@ class SyncFacebook extends BuildTask implements CronTask {
 
                             // get tweets
                             $until = empty($q->until) ? '' : $q->until;
-                            $resp = (object) $this->facebook->sendRequest('get', '/' . $this->conf->FacebookPageId . '/feed?limit=25&until=' . $until)->getDecodedBody();
+                            $resp = (object) $this->facebook->sendRequest(
+                                'get',
+                                '/' . $this->conf->FacebookPageId .
+                                '/' . $this->conf->FacebookPageFeedType. '?limit=25&until=' . $until
+                            )->getDecodedBody();
 
                             // only proceed if we have results to work with
                             if (count($resp->data)) {
