@@ -67,8 +67,11 @@ class RetrySyncFacebookImages extends BuildTask implements CronTask {
         // find any updates that are less than a week old with no image
         $updates = FBUpdate::get()
             ->where('
-                UNIX_TIMESTAMP(OriginalCreated) > ' . (time() - (60 * 60 * 24 * 14)) . ' AND
-                (Page.PrimaryImageID IS NULL OR Page.PrimaryImageID = \'\' OR Page.PrimaryImageID = 0)
+                UNIX_TIMESTAMP(OriginalCreated) > ' . (time() - (60 * 60 * 24 * 14)) . ' AND (' .
+                DataObjectHelper::versioned_table('Page') . '.PrimaryImageID IS NULL OR ' .
+                DataObjectHelper::versioned_table('Page') . '.PrimaryImageID = \'\' OR ' .
+                DataObjectHelper::versioned_table('Page') . '.PrimaryImageID = 0
+                )
             ');
 
         // helpful output
