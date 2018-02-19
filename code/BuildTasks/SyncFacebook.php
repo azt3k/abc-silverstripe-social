@@ -199,15 +199,14 @@ class SyncFacebook extends BuildTask implements CronTask {
                     // $res = (object) $this->facebook->sendRequest('get', '/' . $data->id)->getDecodedBody();
                     // die(print_r($res,1));
 
-                    // create the tweet data object
+                    // create the FBUpdate Page
                     $update = new FBUpdate;
-
                     if ($update->updateFromUpdate($data)) {
-
-                        $update->write();
-
-                        if (!$update->doPublish())
-                            echo 'Failed to Publish '.$update->Title . "\n";
+                        if ($update->write() && $update->doRestoreToStage() && $update->doPublish()) {
+                            echo 'Successfully created' . $update->Title ."<br />\n";
+                        } else {
+                            die('Failed to Publish ' . $update->Title);
+                        }
                     }
 
                     // set no new flag
