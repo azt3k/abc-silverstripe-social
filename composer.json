@@ -1,7 +1,7 @@
 {
     "name": "azt3k/abc-silverstripe-social",
     "description": "Library that adds some social media functionality to Silverstripe",
-    "license": "BSD",
+    "license": "BSD-3-Clause-Clear",
     "type": "silverstripe-module",
     "authors": [
         {

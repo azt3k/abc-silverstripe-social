@@ -140,16 +140,16 @@ class SyncInstagram extends BuildTask implements CronTask{
                     flush();
                     @ob_flush();
 
-                    // create update
+                    // create the InstagramUpdate Page
                     $update = new InstagramUpdate;
 
                     // try to update
                     if ($update->updateFromUpdate($data)) {
-
-                        $update->write();
-
-                        if (!$update->doPublish())
-                            echo 'Failed to Publish '.$update->Title . "\n";
+                        if ($update->write() && $update->doRestoreToStage() && $update->doPublish()) {
+                            echo 'Successfully created' . $update->Title ."<br />\n";
+                        } else {
+                            die('Failed to Publish ' . $update->Title);
+                        }
                     }
 
                     // set no new flag

@@ -186,11 +186,14 @@ class SyncTwitter extends BuildTask implements CronTask{
                     flush();
                     @ob_flush();
 
-                    // create the tweet data object
+                    // create the Tweet Page
                     $tweet = new Tweet;
                     $tweet->updateFromTweet($tweetData);
-                    $tweet->write();
-                    if (!$tweet->doPublish()) die('Failed to Publish '.$tweet->Title);
+                    if ($tweet->write() && $tweet->doRestoreToStage() && $tweet->doPublish()) {
+                        echo 'Successfully created' . $tweet->Title ."<br />\n";
+                    } else {
+                        die('Failed to Publish ' . $tweet->Title);
+                    }
 
                     // set no new flag
                     $noNew = false;
