@@ -40,7 +40,7 @@
             // replace the markup with the short code on save
             // this seems to happen a lot - as in more often than just on save
             ed.onSaveContent.add(function(ed, o) {
-                var $content = $('<div>' + o.content + '</div>');
+                var $content = $('<div>' + o.content + '</div>'), $twitterFrames;
 
                 // transform the embeds back to short codes
                 $content.find('.social-embed').each(function() {
@@ -54,6 +54,9 @@
                 $content.find('#rufous-sandbox').closest('p').remove();
                 $content.find('#rufous-sandbox').remove();
                 $content.find('#fb-root').remove();
+                $twitterFrames = $content.find("iframe[title='Twitter settings iframe']");
+                $twitterFrames.closest('p').remove();
+                $twitterFrames.remove();
 
                 // get the content string
                 var content = $content.html();
