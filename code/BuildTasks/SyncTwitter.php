@@ -62,7 +62,7 @@ class SyncTwitter extends BuildTask implements CronTask{
         $this->run();
     }
 
-    public function run($request) {
+    public function run($request = null) {
 
         // output
         echo "<br />\n<br />\nSyncing...<br />\n<br />\n";

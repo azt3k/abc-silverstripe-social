@@ -20,8 +20,7 @@ class PurgeTwitter extends BuildTask {
         $this->run();
     }
 
-    public function run($request) {
-
+    public function run($request = null) {
         // eol
         $eol = php_sapi_name() == 'cli' ? "\n" : "<br>\n";
 
